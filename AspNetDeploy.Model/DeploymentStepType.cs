@@ -21,6 +21,7 @@ namespace AspNetDeploy.Model
         UpdateHostsFile = 5,
         RunSQLScript = 6,
         DeployDacpac = 7,
-        RunVsTests = 8
+        RunVsTests = 8,
+        DeploySourceFiles = 9
     }
 }

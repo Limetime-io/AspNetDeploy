@@ -149,6 +149,28 @@ namespace AspNetDeploy.WebUI.Controllers
                 return this.View("EditZipArchiveStep", model);
             }
 
+            if (deploymentStepType == DeploymentStepType.DeploySourceFiles)
+            {
+                this.ViewBag.ProjectsSelect = this.Entities.SourceControlVersion
+                    .SelectMany(scv => scv.ProjectVersions)
+                    .Where(pv => pv.ProjectType.HasFlag(ProjectType.SourceFiles))
+                    .Where(pv => !pv.Project.Properties.Any(p => p.Key == "NotForDeployment" && p.Value == "true"))
+                    .Select(pv => new SelectListItem
+                    {
+                        Text = pv.SourceControlVersion.SourceControl.Name + " / " + pv.SourceControlVersion.Name + " / " + pv.Name,
+                        Value = pv.Id.ToString()
+                    })
+                    .OrderBy(sli => sli.Text)
+                    .ToList();
+
+                SourceFilesDeploymentStepModel model = new SourceFilesDeploymentStepModel
+                {
+                    BundleVersionId = bundleVersion.Id
+                };
+
+                return this.View("EditSourceFilesStep", model);
+            }
+
             if (deploymentStepType == DeploymentStepType.UpdateHostsFile)
             {
                 HostsDeploymentStepModel model = new HostsDeploymentStepModel
@@ -273,6 +295,35 @@ namespace AspNetDeploy.WebUI.Controllers
                     .ToList();
 
                 return this.View("EditZipArchiveStep", model);
+            }
+
+            if (deploymentStep.Type == DeploymentStepType.DeploySourceFiles)
+            {
+                SourceFilesDeploymentStepModel model = new SourceFilesDeploymentStepModel
+                {
+                    OrderIndex = deploymentStep.OrderIndex,
+                    DeploymentStepId = deploymentStepId,
+                    BundleVersionId = deploymentStep.BundleVersionId,
+                    StepTitle = deploymentStep.GetStringProperty("Step.Title"),
+                    ProjectId = deploymentStep.GetIntProperty("ProjectId"),
+                    Destination = deploymentStep.GetStringProperty("DestinationPath"),
+                    Roles = string.Join(", ", deploymentStep.MachineRoles.Select(mr => mr.Name)),
+                    CustomConfigurationJson = deploymentStep.GetStringProperty("CustomConfiguration")
+                };
+
+                this.ViewBag.ProjectsSelect = this.Entities.SourceControlVersion
+                    .SelectMany(scv => scv.ProjectVersions)
+                    .Where(pv => pv.ProjectType.HasFlag(ProjectType.SourceFiles))
+                    .Where(pv => !pv.Project.Properties.Any(p => p.Key == "NotForDeployment" && p.Value == "true"))
+                    .Select(pv => new SelectListItem
+                    {
+                        Text = pv.SourceControlVersion.SourceControl.Name + " / " + pv.SourceControlVersion.Name + " / " + pv.Name,
+                        Value = pv.Id.ToString()
+                    })
+                    .OrderBy(sli => sli.Text)
+                    .ToList();
+
+                return this.View("EditSourceFilesStep", model);
             }
 
             if (deploymentStep.Type == DeploymentStepType.Configuration)
@@ -537,6 +588,33 @@ namespace AspNetDeploy.WebUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public ActionResult SaveSourceFilesStep(SourceFilesDeploymentStepModel model)
+        {
+            this.CheckPermission(UserRoleAction.DeploymentChangeSteps);
+
+            if (!this.ModelState.IsValid)
+            {
+                return this.View("EditSourceFilesStep", model);
+            }
+
+            DeploymentStep deploymentStep = this.GetDeploymentStep(model, DeploymentStepType.DeploySourceFiles);
+
+            deploymentStep.SetStringProperty("Step.Title", model.StepTitle);
+            deploymentStep.SetStringProperty("DestinationPath", model.Destination);
+            deploymentStep.SetStringProperty("CustomConfiguration", model.CustomConfigurationJson);
+            deploymentStep.SetStringProperty("ProjectId", model.ProjectId.ToString(CultureInfo.InvariantCulture));
+
+            this.UpdateProjectReference(model);
+
+            this.SaveRoles(model, deploymentStep);
+
+            this.Entities.SaveChanges();
+
+            return this.RedirectToAction("VersionDeployment", "Bundles", new { id = deploymentStep.BundleVersionId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveRunVsTestsStep(RunVsTestStepModel model)
         {
             this.CheckPermission(UserRoleAction.DeploymentChangeSteps);
@@ -577,6 +655,7 @@ namespace AspNetDeploy.WebUI.Controllers
                     case DeploymentStepType.DeployWebSite:
                     case DeploymentStepType.DeployDacpac:
                     case DeploymentStepType.CopyFiles:
+                    case DeploymentStepType.DeploySourceFiles:
                         this.UpdateProjectReference(new ProjectRelatedDeploymentStepModel
                         {
                             BundleVersionId = deploymentStep.BundleVersionId,

@@ -152,6 +152,9 @@ namespace DeploymentServices.Grpc
                 case DeploymentStepType.CopyFiles:
                     this.ProcessCopyFilesStep(deploymentStep);
                     break;
+                case DeploymentStepType.DeploySourceFiles:
+                    this.ProcessCopyFilesStep(deploymentStep);
+                    break;
 
                 case DeploymentStepType.UpdateHostsFile:
                     this.ProcessHostsStep(deploymentStep);

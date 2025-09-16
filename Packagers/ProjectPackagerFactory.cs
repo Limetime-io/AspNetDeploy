@@ -36,6 +36,11 @@ namespace Packagers
                 return new ZipProjectPackager();
             }
 
+            if (projectType.HasFlag(ProjectType.SourceFiles))
+            {
+                return new DirectoryProjectPackager();
+            }
+
             if (projectType.HasFlag(ProjectType.GulpFile))
             {
                 return new GulpProjectPackager();

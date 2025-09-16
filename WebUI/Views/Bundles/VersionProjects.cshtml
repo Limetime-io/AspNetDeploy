@@ -34,6 +34,7 @@
         @ProjectGroup(bundleVersion, "Console projects", ProjectType.Console)
         @ProjectGroup(bundleVersion, "Database projects", ProjectType.Database)
         @ProjectGroup(bundleVersion, "Archives", ProjectType.ZipArchive)
+        @ProjectGroup(bundleVersion, "Source files", ProjectType.SourceFiles)
         @ProjectGroup(bundleVersion, "Gulp files", ProjectType.GulpFile)
     </div>
 </div>
@@ -65,6 +66,10 @@
                         <img src="~/Resources/Layout/Images/Icons/VsDatabaseProject.png" />
                     }
                     else if (projectVersion.ProjectType.HasFlag(ProjectType.ZipArchive))
+                    {
+                        <img src="~/Resources/Layout/Images/Icons/zip32.png" />
+                    }
+                    else if (projectVersion.ProjectType.HasFlag(ProjectType.SourceFiles))
                     {
                         <img src="~/Resources/Layout/Images/Icons/zip32.png" />
                     }
