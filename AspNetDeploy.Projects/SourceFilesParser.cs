@@ -28,7 +28,10 @@ namespace AspNetDeploy.Projects
 
             string normalizedSourcesFolder = this.NormalizeSourcesFolder();
 
-            this.parsedProjects = Directory
+            DirectoryInfo rootDirectory = new DirectoryInfo(this.sourcesFolder);
+            string rootFullName = rootDirectory.FullName.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            List<SourceFilesProject> projects = Directory
                 .GetDirectories(this.sourcesFolder, "*", SearchOption.TopDirectoryOnly)
                 .Select(path => new DirectoryInfo(path))
                 .Where(directoryInfo => !directoryInfo.Name.StartsWith(".", StringComparison.Ordinal))
@@ -48,6 +51,16 @@ namespace AspNetDeploy.Projects
                     };
                 })
                 .ToList();
+
+            projects.Insert(0, new SourceFilesProject
+            {
+                DirectoryPath = rootFullName,
+                RelativePath = string.Empty,
+                Name = string.IsNullOrEmpty(rootDirectory.Name) ? rootFullName : rootDirectory.Name,
+                Guid = GuidUtility.Create(GuidUtility.UrlNamespace, rootFullName.Replace(Path.DirectorySeparatorChar, '/'))
+            });
+
+            this.parsedProjects = projects;
         }
 
         public IList<Guid> ListProjectGuids()
