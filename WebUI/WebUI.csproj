@@ -303,6 +303,7 @@
     <Compile Include="Models\ProjectVersionInfo.cs" />
     <Compile Include="Models\SourceControlInfo.cs" />
     <Compile Include="Models\SourceControlVersionInfo.cs" />
+    <Compile Include="Models\DeploymentSteps\SourceFilesDeploymentStepModel.cs" />
     <Compile Include="Models\DeploymentSteps\ZipArchiveDeploymentStepModel.cs" />
     <Compile Include="Mvc\ControllerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -338,6 +339,7 @@
     <Content Include="Views\Variables\Edit.cshtml" />
     <Content Include="Views\Variables\Details.cshtml" />
     <Content Include="Views\Bundles\CreateNewVersion.cshtml" />
+    <Content Include="Views\BundleVersionDeployment\EditSourceFilesStep.cshtml" />
     <Content Include="Views\BundleVersionDeployment\EditZipArchiveStep.cshtml" />
     <Content Include="Views\BundleVersionDeployment\EditSqlScriptStep.cshtml" />
     <Content Include="Views\BundleVersionDeployment\EditDacpacStep.cshtml" />

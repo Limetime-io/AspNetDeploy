@@ -159,6 +159,9 @@ namespace AspNetDeploy.DeploymentServices.WCFSatellite
                 case DeploymentStepType.CopyFiles:
                     this.ProcessCopyFilesStep(deploymentStep);
                     break;
+                case DeploymentStepType.DeploySourceFiles:
+                    this.ProcessCopyFilesStep(deploymentStep);
+                    break;
 
                 case DeploymentStepType.UpdateHostsFile:
                     this.ProcessHostsStep(deploymentStep);

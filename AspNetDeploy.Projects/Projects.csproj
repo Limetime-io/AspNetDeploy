@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="ProjectParsingManager.cs" />
     <Compile Include="ProjectParsingService.cs" />
+    <Compile Include="SourceFilesParser.cs" />
     <Compile Include="ProjectParsingDataContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -87,6 +88,10 @@
     <ProjectReference Include="..\AspNetDeploy.Projects.Zip\Projects.Zip.csproj">
       <Project>{dcac5e5e-2fc1-4c1d-b2b3-77113d98c40f}</Project>
       <Name>Projects.Zip</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Guids\Guids.csproj">
+      <Project>{845C08E5-6953-42E0-A7DA-91DF6BEF62A9}</Project>
+      <Name>Guids</Name>
     </ProjectReference>
     <ProjectReference Include="..\ObjectFactory\ObjectFactory.csproj">
       <Project>{F5CBAA93-C1C9-43C5-9AB6-8AC2F9DB7741}</Project>

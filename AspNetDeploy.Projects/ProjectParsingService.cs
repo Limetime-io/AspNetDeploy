@@ -34,6 +34,7 @@ namespace AspNetDeploy.Projects
             {
                 new VisualStudioProjectParser(sourcesFolder),
                 new ZipFilesParser(sourcesFolder),
+                new SourceFilesParser(sourcesFolder),
                 new GulpParser(sourcesFolder)
             };
 

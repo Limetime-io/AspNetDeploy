@@ -25,6 +25,7 @@ namespace AspNetDeploy.Model
         WindowsApplication = 128,
         ZipArchive = 256,
         GulpFile = 512,
-        NetCore = 1024
+        NetCore = 1024,
+        SourceFiles = 2048
     }
 }
