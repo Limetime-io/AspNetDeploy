@@ -76,6 +76,11 @@ namespace Packagers.VisualStudioProject
                 return true;
             }
 
+            if (targetFramework.Equals("net9.0", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+
             return false;
         }
     }
