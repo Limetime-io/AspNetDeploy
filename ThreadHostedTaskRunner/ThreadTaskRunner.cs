@@ -285,7 +285,11 @@ namespace ThreadHostedTaskRunner
                     TaskRunnerContext.SetProjectVersionState(projectVersion.Id, ProjectState.Error);
                 }
 
-                List<ProjectVersion> projectVersionsToRebuild = projectVersions.Where(pv => pv.SourceControlVersion.GetStringProperty("Revision") != pv.GetStringProperty("LastBuildRevision")).ToList();
+                List<ProjectVersion> projectVersionsToRebuild = projectVersions
+                    .Where(pv => 
+                        pv.SourceControlVersion.ArchiveState == SourceControlVersionArchiveState.Normal && 
+                        pv.SourceControlVersion.GetStringProperty("Revision") != pv.GetStringProperty("LastBuildRevision"))
+                    .ToList();
 
                 if (projectVersionsToRebuild.Count == 0)
                 {
