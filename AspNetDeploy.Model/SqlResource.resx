@@ -681,12 +681,13 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ProjectToBundle]') AND type in (N'U'))
 BEGIN
 CREATE TABLE [dbo].[ProjectToBundle](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[ProjectId] [int] NOT NULL,
 	[BundleId] [int] NOT NULL,
+	[PackagerId] [int] NULL,
  CONSTRAINT [PK_ProjectToBundle] PRIMARY KEY CLUSTERED 
 (
-	[ProjectId] ASC,
-	[BundleId] ASC
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 END

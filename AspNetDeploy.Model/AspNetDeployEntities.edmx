@@ -276,11 +276,12 @@
 				</EntityType>
 				<EntityType Name="ProjectToBundle">
 					<Key>
-						<PropertyRef Name="ProjectId" />
-						<PropertyRef Name="BundleId" />
+						<PropertyRef Name="Id" />
 					</Key>
+					<Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
 					<Property Name="ProjectId" Type="int" Nullable="false" />
 					<Property Name="BundleId" Type="int" Nullable="false" />
+					<Property Name="PackagerId" Type="int" />
 				</EntityType>
 				<EntityType Name="ProjectVersion">
 					<Key>
