@@ -273,6 +273,7 @@
     <Compile Include="Models\CreateNewSourceControlVersion.cs" />
     <Compile Include="Models\CreateNewSvnVersion.cs" />
     <Compile Include="Models\CreateNewFileSystemVersion.cs" />
+    <Compile Include="Models\DeploymentSteps\ContainerDeploymentStepModel.cs" />
     <Compile Include="Models\DeploymentSteps\DacpacDeploymentStepModel.cs" />
     <Compile Include="Models\DeploymentSteps\DeploymentStepEditModelFactory.cs" />
     <Compile Include="Models\DeploymentSteps\HostsDeploymentStepModel.cs" />

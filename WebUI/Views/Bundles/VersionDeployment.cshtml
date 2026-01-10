@@ -90,6 +90,10 @@
                     @RenderRunVsTestsStep(bundleVersion, deploymentStep, stepCounter)
                     break;
 
+                case DeploymentStepType.DeployContainer:
+                    @RenderContainerStep(bundleVersion, deploymentStep, stepCounter)
+                    break;
+
                 default:
                     <div>Unknown step</div>
                     break;
@@ -367,6 +371,51 @@
     </div>
 }
 
+@helper RenderContainerStep(BundleVersion bundleVersion, DeploymentStep deploymentStep, int stepCounter)
+{
+    <h2>
+        <div class="row">
+            <div class="col-sm-7">
+                @(stepCounter). Deploy container: @deploymentStep.GetStringProperty("Step.Title") <small>CONTAINER</small>
+            </div>
+            <div class="col-sm-5 text-end">@RenderControlButtons(bundleVersion, deploymentStep)</div>
+        </div>
+    </h2>
+    <div class="row text-muted">
+        <div class="col-md-6">
+            <ul>
+                <li>
+                    Roles:
+
+                    @foreach (MachineRole role in deploymentStep.MachineRoles)
+                    {
+                        <span class="label label-default">@role.Name</span>
+                    }
+                </li>
+                <li>Container name: @deploymentStep.GetStringProperty("Container.Name")</li>
+                <li>Ports: @deploymentStep.GetStringProperty("Container.Ports")</li>
+                <li>
+                    Environment variables:
+                    <pre>@deploymentStep.GetStringProperty("Container.EnvironmentVariables")</pre>
+                </li>
+                <li>
+                    Labels:
+                    <pre>@deploymentStep.GetStringProperty("Container.Labels")</pre>
+                </li>
+                <li>
+                    Volumes:
+                    <pre>@deploymentStep.GetStringProperty("Container.Volumes")</pre>
+                </li>
+                <li>Restart policy: @deploymentStep.GetStringProperty("Container.RestartPolicy")</li>
+                <li>
+                    Networks:
+                    <pre>@deploymentStep.GetStringProperty("Container.Networks")</pre>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
 
 @helper RenderSQLStep(BundleVersion bundleVersion, DeploymentStep deploymentStep, int stepCounter)
 {
@@ -483,6 +532,4 @@
     </div>
 
 }
-
-
 

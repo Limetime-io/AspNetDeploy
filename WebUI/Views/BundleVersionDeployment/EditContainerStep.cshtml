@@ -1,0 +1,136 @@
+﻿@model AspNetDeploy.WebUI.Models.DeploymentSteps.ContainerDeploymentStepModel
+
+@{
+    ViewBag.Title = "Index";
+    ViewBag.PageClass = "deploymetStepPage";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    BundleVersion bundleVersion = this.ViewBag.BundleVersion;
+    IEnumerable<MachineRole> machineRoles = this.ViewBag.MachineRoles;
+}
+
+<div class="container">
+
+    <h1>
+        <div class="row">
+            <div class="col-md-10">
+                @bundleVersion.Bundle.Name @bundleVersion.Name <small>Bundle</small>
+            </div>
+        </div>
+    </h1>
+
+    <hr />
+
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="@Url.Action("VersionProjects", "Bundles", new { id = bundleVersion.Id })">Projects</a></li>
+        <li role="presentation" class="active"><a href="@Url.Action("VersionDeployment", "Bundles", new { id = bundleVersion.Id })">Deployment process</a></li>
+        <li role="presentation"><a href="@Url.Action("VersionPackages", "Bundles", new { id = bundleVersion.Id })">Packages & Publications</a></li>
+    </ul>
+
+    <hr />
+
+    <h3>@this.Model.OrderIndex. Deploy container: @this.Model.StepTitle <small>CONTAINER</small></h3>
+
+    @using (Html.BeginForm("SaveContainerStep", "BundleVersionDeployment", new { }, FormMethod.Post, new { id = "idForm", Class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.BundleVersionId)
+        @Html.HiddenFor(m => m.DeploymentStepId)
+
+        <div class="row">
+            <div class="col-md-12 ">
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Step title</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.StepTitle, new { Class = "form-control", placeholder = "step title" })
+                        @Html.ValidationMessageFor(m => m.StepTitle)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Roles</label>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Roles, new { Class = "form-control", placeholder = "roles, comma separated" })
+                        @Html.ValidationMessageFor(m => m.Roles)
+                        &nbsp;&nbsp;
+                        @foreach (MachineRole machineRole in machineRoles)
+                        {
+                            <small class="text-muted">@machineRole.Name</small>
+                            @:&nbsp;
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Container name</label>
+                    <div class="col-sm-10">
+                        @Html.TextBoxFor(m => m.ContainerName, new { Class = "form-control", placeholder = "container name" })
+                        @Html.ValidationMessageFor(m => m.ContainerName)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Ports</label>
+                    <div class="col-sm-10">
+                        @Html.TextBoxFor(m => m.Ports, new { Class = "form-control", placeholder = "ports, comma separated" })
+                        @Html.ValidationMessageFor(m => m.Ports)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Environment variables</label>
+                    <div class="col-sm-10">
+                        @Html.TextAreaFor(m => m.EnvironmentVariables, new { Class = "form-control", placeholder = "KEY=VALUE", rows = 6 })
+                        @Html.ValidationMessageFor(m => m.EnvironmentVariables)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Labels</label>
+                    <div class="col-sm-10">
+                        @Html.TextAreaFor(m => m.Labels, new { Class = "form-control", placeholder = "key=value", rows = 4 })
+                        @Html.ValidationMessageFor(m => m.Labels)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Volumes</label>
+                    <div class="col-sm-10">
+                        @Html.TextAreaFor(m => m.Volumes, new { Class = "form-control", placeholder = "host_path:container_path", rows = 4 })
+                        @Html.ValidationMessageFor(m => m.Volumes)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Restart policy</label>
+                    <div class="col-sm-10">
+                        @Html.TextBoxFor(m => m.RestartPolicy, new { Class = "form-control", placeholder = "always/on-failure" })
+                        @Html.ValidationMessageFor(m => m.RestartPolicy)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Networks</label>
+                    <div class="col-sm-10">
+                        @Html.TextAreaFor(m => m.Networks, new { Class = "form-control", placeholder = "network names", rows = 3 })
+                        @Html.ValidationMessageFor(m => m.Networks)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-5">
+                        <button type="submit" class="btn btn-default">Сохранить</button>
+                    </div>
+                    @if (this.Model.DeploymentStepId > 0)
+                    {
+                        <div class="col-sm-5 text-right">
+                            <a href="@Url.Action("DeleteStep", new {id = this.Model.BundleVersionId, deploymentStepId = this.Model.DeploymentStepId})" onclick=" if (!confirm('Удалить?')) return false; ">Удалить шаг</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

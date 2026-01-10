@@ -22,6 +22,7 @@ namespace AspNetDeploy.Model
         RunSQLScript = 6,
         DeployDacpac = 7,
         RunVsTests = 8,
-        DeploySourceFiles = 9
+        DeploySourceFiles = 9,
+        DeployContainer = 10
     }
 }
