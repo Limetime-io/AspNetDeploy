@@ -221,6 +221,16 @@ namespace AspNetDeploy.WebUI.Controllers
 
                 return this.View("EditRunTestStep", model);
             }
+
+            if (deploymentStepType == DeploymentStepType.DeployContainer)
+            {
+                ContainerDeploymentStepModel model = new ContainerDeploymentStepModel
+                {
+                    BundleVersionId = bundleVersion.Id
+                };
+
+                return this.View("EditContainerStep", model);
+            }
             
             throw new AspNetDeployException("Invalid deployment step type");
         }
@@ -428,6 +438,27 @@ namespace AspNetDeploy.WebUI.Controllers
                     .ToList();
 
                 return this.View("EditRunTestStep", model);
+            }
+
+            if (deploymentStep.Type == DeploymentStepType.DeployContainer)
+            {
+                ContainerDeploymentStepModel model = new ContainerDeploymentStepModel
+                {
+                    OrderIndex = deploymentStep.OrderIndex,
+                    BundleVersionId = deploymentStep.BundleVersionId,
+                    DeploymentStepId = deploymentStepId,
+                    Roles = string.Join(", ", deploymentStep.MachineRoles.Select(mr => mr.Name)),
+                    StepTitle = deploymentStep.GetStringProperty("Step.Title"),
+                    ContainerName = deploymentStep.GetStringProperty("Container.Name"),
+                    Ports = deploymentStep.GetStringProperty("Container.Ports"),
+                    EnvironmentVariables = deploymentStep.GetStringProperty("Container.EnvironmentVariables"),
+                    Labels = deploymentStep.GetStringProperty("Container.Labels"),
+                    Volumes = deploymentStep.GetStringProperty("Container.Volumes"),
+                    RestartPolicy = deploymentStep.GetStringProperty("Container.RestartPolicy"),
+                    Networks = deploymentStep.GetStringProperty("Container.Networks")
+                };
+
+                return this.View("EditContainerStep", model);
             }
 
             return this.Content("Unsupported step type");
@@ -638,6 +669,35 @@ namespace AspNetDeploy.WebUI.Controllers
             this.Entities.SaveChanges();
 
             return this.RedirectToAction("VersionDeployment", "Bundles", new {id = deploymentStep.BundleVersionId});
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SaveContainerStep(ContainerDeploymentStepModel model)
+        {
+            this.CheckPermission(UserRoleAction.DeploymentChangeSteps);
+
+            if (!this.ModelState.IsValid)
+            {
+                return this.View("EditContainerStep", model);
+            }
+
+            DeploymentStep deploymentStep = this.GetDeploymentStep(model, DeploymentStepType.DeployContainer);
+
+            deploymentStep.SetStringProperty("Step.Title", model.StepTitle);
+            deploymentStep.SetStringProperty("Container.Name", model.ContainerName);
+            deploymentStep.SetStringProperty("Container.Ports", model.Ports);
+            deploymentStep.SetStringProperty("Container.EnvironmentVariables", model.EnvironmentVariables);
+            deploymentStep.SetStringProperty("Container.Labels", model.Labels);
+            deploymentStep.SetStringProperty("Container.Volumes", model.Volumes);
+            deploymentStep.SetStringProperty("Container.RestartPolicy", model.RestartPolicy);
+            deploymentStep.SetStringProperty("Container.Networks", model.Networks);
+
+            this.SaveRoles(model, deploymentStep);
+
+            this.Entities.SaveChanges();
+
+            return this.RedirectToAction("VersionDeployment", "Bundles", new { id = deploymentStep.BundleVersionId });
         }
 
         public ActionResult DeleteStep(int id, int deploymentStepId)
