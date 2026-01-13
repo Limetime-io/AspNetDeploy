@@ -780,15 +780,15 @@ namespace AspNetDeploy.WebUI.Controllers
         private void UpdateProjectReference(ProjectRelatedDeploymentStepModel model)
         {
             BundleVersion bundleVersion = this.Entities.BundleVersion
-                .Include("ProjectVersions")
+                .Include("ProjectVersions.ProjectVersion")
                 .Include("DeploymentSteps.Properties")
                 .First(bv => bv.Id == model.BundleVersionId);
 
-            foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions.ToList())
+            foreach (ProjectVersionToBundleVersion projectVersionLink in bundleVersion.ProjectVersions.ToList())
             {
-                if (bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != projectVersion.Id))
+                if (bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != projectVersionLink.ProjectVersionId))
                 {
-                    bundleVersion.ProjectVersions.Remove(projectVersion);
+                    bundleVersion.ProjectVersions.Remove(projectVersionLink);
                 }
             }
 
@@ -796,9 +796,15 @@ namespace AspNetDeploy.WebUI.Controllers
             {
                 ProjectVersion projectVersion = this.Entities.ProjectVersion.First(pv => pv.Id == model.ProjectId);
 
-                if (!bundleVersion.ProjectVersions.Contains(projectVersion))
+                if (!bundleVersion.ProjectVersions.Any(link => link.ProjectVersionId == projectVersion.Id))
                 {
-                    bundleVersion.ProjectVersions.Add(projectVersion);
+                    bundleVersion.ProjectVersions.Add(new ProjectVersionToBundleVersion
+                    {
+                        BundleVersion = bundleVersion,
+                        ProjectVersion = projectVersion,
+                        BundleVersionId = bundleVersion.Id,
+                        ProjectVersionId = projectVersion.Id
+                    });
                 }
             }
         }

@@ -44,6 +44,7 @@ namespace AspNetDeploy.Model
         public virtual DbSet<Publication> Publication { get; set; }
         public virtual DbSet<BundleVersionProperty> BundleVersionProperty { get; set; }
         public virtual DbSet<ProjectVersionProperty> ProjectVersionProperty { get; set; }
+        public virtual DbSet<ProjectVersionToBundleVersion> ProjectVersionToBundleVersion { get; set; }
         public virtual DbSet<MachinePublication> MachinePublication { get; set; }
         public virtual DbSet<MachinePublicationLog> MachinePublicationLog { get; set; }
         public virtual DbSet<MachinePublicationProperty> MachinePublicationProperty { get; set; }

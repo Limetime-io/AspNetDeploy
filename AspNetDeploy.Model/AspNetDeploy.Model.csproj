@@ -209,6 +209,9 @@
     <Compile Include="ProjectVersion.cs">
       <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="ProjectVersionToBundleVersion.cs">
+      <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="ProjectVersionExtender.cs" />
     <Compile Include="ProjectVersionProperty.cs">
       <DependentUpon>AspNetDeployEntities.tt</DependentUpon>

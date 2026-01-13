@@ -43,9 +43,9 @@
 {
     <h2>@name</h2>
 
-    if (bundleVersion.ProjectVersions.Any(pv => pv.ProjectType.HasFlag(projectType)))
+    if (bundleVersion.ProjectVersions.Any(pv => pv.ProjectVersion.ProjectType.HasFlag(projectType)))
     {
-        foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions.Where(pv => pv.ProjectType.HasFlag(projectType)))
+        foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions.Select(pv => pv.ProjectVersion).Where(pv => pv.ProjectType.HasFlag(projectType)))
         {
             <div class="row">
                 <div class="col-sm-6">

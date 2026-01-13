@@ -54,7 +54,7 @@
                 <th>New source control</th>
             </tr>
         </thead>
-        @foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions)
+        @foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions.Select(pv => pv.ProjectVersion))
         {
             <tr>
                 <td>@projectVersion.Name</td>

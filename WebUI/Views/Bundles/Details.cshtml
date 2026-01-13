@@ -124,7 +124,7 @@
 
                 <h4>Source control dependencies</h4>
                 <ul>
-                    @foreach (SourceControlVersion sourceControlVersion in bundleVersion.ProjectVersions.Select(pv => pv.SourceControlVersion).Distinct())
+                    @foreach (SourceControlVersion sourceControlVersion in bundleVersion.ProjectVersions.Select(pv => pv.ProjectVersion.SourceControlVersion).Distinct())
                     {
                         <li>@sourceControlVersion.SourceControl.Name / @sourceControlVersion.Name</li>
                     }

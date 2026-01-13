@@ -28,8 +28,8 @@ namespace AspNetDeploy.ContinuousIntegration
             BundleVersion bundleVersion = entities.BundleVersion
                 .Include("Bundle")
                 .Include("Packages")
-                .Include("ProjectVersions.Project")
-                .Include("ProjectVersions.SourceControlVersion.SourceControl")
+                .Include("ProjectVersions.ProjectVersion.Project")
+                .Include("ProjectVersions.ProjectVersion.SourceControlVersion.SourceControl")
                 .First(bv => bv.Id == bundleVersionId);
 
             Package package = new Package
@@ -45,8 +45,9 @@ namespace AspNetDeploy.ContinuousIntegration
                 zipFile.AlternateEncoding = Encoding.UTF8;
                 zipFile.AlternateEncodingUsage = ZipOption.Always;
 
-                foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions)
+                foreach (ProjectVersionToBundleVersion projectVersionLink in bundleVersion.ProjectVersions)
                 {
+                    ProjectVersion projectVersion = projectVersionLink.ProjectVersion;
                     string sourcesFolder = this.pathServices.GetSourceControlVersionPath(projectVersion.SourceControlVersion.SourceControl.Id, projectVersion.SourceControlVersion.Id);
                     string projectPackagePath = this.pathServices.GetProjectPackagePath(projectVersion.Id, projectVersion.SourceControlVersion.GetStringProperty("Revision"));
                     string projectPath = Path.Combine(sourcesFolder, projectVersion.ProjectFile);
@@ -86,8 +87,9 @@ namespace AspNetDeploy.ContinuousIntegration
             package.PackageDate = DateTime.UtcNow;
             entities.SaveChanges();
 
-            foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions)
+            foreach (ProjectVersionToBundleVersion projectVersionLink in bundleVersion.ProjectVersions)
             {
+                ProjectVersion projectVersion = projectVersionLink.ProjectVersion;
                 string projectPackagePath = this.pathServices.GetProjectPackagePath(projectVersion.Id, projectVersion.SourceControlVersion.GetStringProperty("Revision"));
                 File.Delete(projectPackagePath);
             }

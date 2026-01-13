@@ -16,7 +16,7 @@ namespace AspNetDeploy.Model
     {
         public ProjectVersion()
         {
-            this.BundleVersions = new HashSet<BundleVersion>();
+            this.BundleVersions = new HashSet<ProjectVersionToBundleVersion>();
             this.Properties = new HashSet<ProjectVersionProperty>();
             this.PackageEntries = new HashSet<PackageEntry>();
         }
@@ -32,7 +32,7 @@ namespace AspNetDeploy.Model
     
         public virtual Project Project { get; set; }
         public virtual SourceControlVersion SourceControlVersion { get; set; }
-        public virtual ICollection<BundleVersion> BundleVersions { get; set; }
+        public virtual ICollection<ProjectVersionToBundleVersion> BundleVersions { get; set; }
         public virtual ICollection<ProjectVersionProperty> Properties { get; set; }
         public virtual ICollection<PackageEntry> PackageEntries { get; set; }
     }
