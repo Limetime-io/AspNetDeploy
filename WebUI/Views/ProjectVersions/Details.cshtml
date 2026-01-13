@@ -21,7 +21,7 @@
     {
         <h3>In bundles</h3>
         <ul>
-            @foreach (BundleVersion bundleVersion in projectVersion.BundleVersions)
+            @foreach (BundleVersion bundleVersion in projectVersion.BundleVersions.Select(bv => bv.BundleVersion))
             {
                 <li><a href="@Url.Action("VersionProjects", "Bundles", new { id = bundleVersion.Id })">@bundleVersion.Bundle.Name, @bundleVersion.Name</a></li>
             }

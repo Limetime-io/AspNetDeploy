@@ -116,7 +116,7 @@ namespace AspNetDeploy.WebUI.Controllers
             BundleVersion bundleVersion = this.Entities.BundleVersion
                 .Include("Bundle")
                 .Include("Properties")
-                .Include("ProjectVersions.SourceControlVersion.SourceControl")
+                .Include("ProjectVersions.ProjectVersion.SourceControlVersion.SourceControl")
                 .First(bv => bv.Id == id );
 
             this.ViewBag.BundleVersion = bundleVersion;
@@ -137,8 +137,8 @@ namespace AspNetDeploy.WebUI.Controllers
 
             BundleVersion sourceBundleVersion = this.Entities.BundleVersion
                 .Include("Bundle")
-                .Include("ProjectVersions.Project")
-                .Include("ProjectVersions.SourceControlVersion.SourceControl")
+                .Include("ProjectVersions.ProjectVersion.Project")
+                .Include("ProjectVersions.ProjectVersion.SourceControlVersion.SourceControl")
                 .Include("Properties")
                 .Include("DataFields.DataFieldValues.Environment")
                 .Include("DataFields.DataFieldValues.Machine")
@@ -162,7 +162,7 @@ namespace AspNetDeploy.WebUI.Controllers
                 {
                     p.projectVersionId,
                     p.sourceControlVersionId,
-                    projectVersion = sourceBundleVersion.ProjectVersions.First(pv => pv.Id == p.projectVersionId)
+                    projectVersion = sourceBundleVersion.ProjectVersions.First(pv => pv.ProjectVersionId == p.projectVersionId).ProjectVersion
                 })
                 .ToList()
                 .Select(p => new
@@ -272,7 +272,13 @@ namespace AspNetDeploy.WebUI.Controllers
 
             foreach (ProjectVersion usedProjectVersion in usedProjectVersions)
             {
-                newBundleVersion.ProjectVersions.Add(usedProjectVersion);
+                newBundleVersion.ProjectVersions.Add(new ProjectVersionToBundleVersion
+                {
+                    BundleVersion = newBundleVersion,
+                    ProjectVersion = usedProjectVersion,
+                    BundleVersionId = newBundleVersion.Id,
+                    ProjectVersionId = usedProjectVersion.Id
+                });
             }
 
             this.Entities.SaveChanges();
@@ -298,7 +304,7 @@ namespace AspNetDeploy.WebUI.Controllers
         {
             Bundle bundle = this.Entities.Bundle
                 .Include("BundleVersions.Properties")
-                .Include("BundleVersions.ProjectVersions.SourceControlVersion.SourceControl")
+                .Include("BundleVersions.ProjectVersions.ProjectVersion.SourceControlVersion.SourceControl")
                 .First( b => b.Id == id);
 
             List<object> tree = bundle.BundleVersions.Where(bv => bv.ParentBundleVersion == null).Select(TreeSelector).ToList();
@@ -334,7 +340,7 @@ namespace AspNetDeploy.WebUI.Controllers
 
             IList<BundleRevision> revisions = new List<BundleRevision>();
 
-            foreach(IGrouping < SourceControlVersion, ProjectVersion > group in bundleVersion.ProjectVersions.GroupBy(v => v.SourceControlVersion))
+            foreach(IGrouping < SourceControlVersion, ProjectVersion > group in bundleVersion.ProjectVersions.Select(v => v.ProjectVersion).GroupBy(v => v.SourceControlVersion))
             {
                 Revision latestRevision = group.Key.Revisions.OrderByDescending(r => r.CreatedDate).FirstOrDefault();
 
@@ -385,8 +391,8 @@ namespace AspNetDeploy.WebUI.Controllers
         {
             BundleVersion bundleVersion = this.Entities.BundleVersion
                 .Include("Bundle")
-                .Include("ProjectVersions.Project.Properties")
-                .Include("ProjectVersions.SourceControlVersion.SourceControl.Properties")
+                .Include("ProjectVersions.ProjectVersion.Project.Properties")
+                .Include("ProjectVersions.ProjectVersion.SourceControlVersion.SourceControl.Properties")
                 .First( b => b.Id == id);
 
             this.ViewBag.BundleVersion = bundleVersion;
@@ -412,8 +418,8 @@ namespace AspNetDeploy.WebUI.Controllers
         {
             BundleVersion bundleVersion = this.Entities.BundleVersion
                 .Include("Bundle")
-                .Include("ProjectVersions.Project.Properties")
-                .Include("ProjectVersions.SourceControlVersion.SourceControl.Properties")
+                .Include("ProjectVersions.ProjectVersion.Project.Properties")
+                .Include("ProjectVersions.ProjectVersion.SourceControlVersion.SourceControl.Properties")
                 .Include("DeploymentSteps.Properties")
                 .Include("DeploymentSteps.MachineRoles")
                 .First( b => b.Id == id);
@@ -428,7 +434,7 @@ namespace AspNetDeploy.WebUI.Controllers
         {
             List<BundleVersion> bundleVersions = this.Entities.BundleVersion
                 .Include("Properties")
-                .Include("ProjectVersions.SourceControlVersion.Properties")
+                .Include("ProjectVersions.ProjectVersion.SourceControlVersion.Properties")
                 .ToList();
 
             var states = bundleVersions.Select(this.GetBundleVersionInfo).ToList();
@@ -489,7 +495,7 @@ namespace AspNetDeploy.WebUI.Controllers
                 elapsedSecs = (int)elapsedSecs,
                 totalSecs = (int)totalSecs,
                 state = bundleState.ToString(),
-                projects = bundleVersion.ProjectVersions.Select(this.GetProjectVersionInfo).ToList()
+                projects = bundleVersion.ProjectVersions.Select(pv => this.GetProjectVersionInfo(pv.ProjectVersion)).ToList()
             };
         }
 

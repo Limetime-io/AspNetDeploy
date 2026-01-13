@@ -29,8 +29,8 @@ namespace AspNetDeploy.ContinuousIntegration
 
             Publication publication = entities.Publication
                 .Include("Package.BundleVersion.Properties")
-                .Include("Package.BundleVersion.ProjectVersions")
-                .Include("Package.BundleVersion.ProjectVersions.SourceControlVersion")
+                .Include("Package.BundleVersion.ProjectVersions.ProjectVersion")
+                .Include("Package.BundleVersion.ProjectVersions.ProjectVersion.SourceControlVersion")
                 .Include("Package.BundleVersion.DeploymentSteps.Properties")
                 .Include("Package.BundleVersion.DeploymentSteps.MachineRoles")
                 .Include("Environment.Properties")
@@ -121,7 +121,7 @@ namespace AspNetDeploy.ContinuousIntegration
                             this.LogMachinePublicationStep(machinePublication, deploymentStep, entities, MachinePublicationLogEvent.DeploymentStepExecuting);
 
                             IVariableProcessor variableProcessor = this.variableProcessorFactory.Create(publication.PackageId, machine.Id);
-                            ProjectVersion projectVersion = publication.Package.BundleVersion.ProjectVersions.First(pv => pv.Id == deploymentStep.GetIntProperty("ProjectId"));
+                            ProjectVersion projectVersion = publication.Package.BundleVersion.ProjectVersions.First(pv => pv.ProjectVersionId == deploymentStep.GetIntProperty("ProjectId")).ProjectVersion;
 
                             IProjectTestRunner projectTestRunner = this.projectTestRunnerFactory.Create(projectVersion.ProjectType, variableProcessor);
 
