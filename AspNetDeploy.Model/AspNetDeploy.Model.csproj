@@ -143,9 +143,6 @@
     <Compile Include="Environment.cs">
       <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="EnvironmentChain.cs">
-      <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
-    </Compile>
     <Compile Include="EnvironmentExtender.cs" />
     <Compile Include="EnvironmentProperty.cs">
       <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
@@ -211,6 +208,9 @@
     </Compile>
     <Compile Include="ProjectVersionExtender.cs" />
     <Compile Include="ProjectVersionProperty.cs">
+      <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectVersionToBundleVersion.cs">
       <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

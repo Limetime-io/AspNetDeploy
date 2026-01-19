@@ -14,8 +14,8 @@ namespace ThreadHostedTaskRunner.Jobs
             AspNetDeployEntities entities = new AspNetDeployEntities();
 
             BundleVersion bundleVersion = entities.BundleVersion
-                .Include("ProjectVersions.Properties")
-                .Include("ProjectVersions.SourceControlVersion.Properties")
+                .Include("ProjectVersionTobundleVersion.ProjectVersion.Properties")
+                .Include("ProjectVersionTobundleVersion.ProjectVersion.SourceControlVersion.Properties")
                 .Include("Properties")
                 .First(bv => bv.Id == bundleId);
 
@@ -24,7 +24,7 @@ namespace ThreadHostedTaskRunner.Jobs
             PackageManager packageManager = Factory.GetInstance<PackageManager>();
             packageManager.PackageBundle(bundleId);
 
-            foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions)
+            foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersionToBundleVersion.Select(x => x.ProjectVersion).Distinct())
             {
                 projectVersion.SetStringProperty("LastPackageRevision", projectVersion.SourceControlVersion.GetStringProperty("Revision"));
                 projectVersion.SetStringProperty("LastPackageDate", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));

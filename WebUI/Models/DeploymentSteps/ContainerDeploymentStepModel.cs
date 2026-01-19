@@ -1,6 +1,6 @@
 ﻿namespace AspNetDeploy.WebUI.Models.DeploymentSteps
 {
-    public class ContainerDeploymentStepModel : DeploymentStepModel
+    public class ContainerDeploymentStepModel : ProjectRelatedDeploymentStepModel
     {
         public string StepTitle { get; set; }
         public string ContainerName { get; set; }

@@ -17,11 +17,11 @@
 
     <hr />
     
-    @if (projectVersion.BundleVersions.Count > 0)
+    @if (projectVersion.ProjectVersionToBundleVersion.Count > 0)
     {
         <h3>In bundles</h3>
         <ul>
-            @foreach (BundleVersion bundleVersion in projectVersion.BundleVersions)
+            @foreach (BundleVersion bundleVersion in projectVersion.ProjectVersionToBundleVersion.Select(x => x.BundleVersion).Distinct())
             {
                 <li><a href="@Url.Action("VersionProjects", "Bundles", new { id = bundleVersion.Id })">@bundleVersion.Bundle.Name, @bundleVersion.Name</a></li>
             }

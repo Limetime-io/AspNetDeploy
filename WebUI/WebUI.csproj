@@ -188,6 +188,7 @@
     <Content Include="Resources\Layout\bootstrap-theme.css.map" />
     <Content Include="Resources\Layout\bootstrap.css.map" />
     <Content Include="Mvc.sitemap" />
+    <Content Include="Connections.config" />
     <None Include="MvcSiteMapSchema.xsd">
       <SubType>Designer</SubType>
     </None>

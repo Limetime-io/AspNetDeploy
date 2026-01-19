@@ -4,7 +4,7 @@
     {
         string GetSourceControlVersionPath(int sourceControlId, int sourceControlVersionId);
         string GetBundlePackagePath(int bundleId, int packageId);
-        string GetProjectPackagePath(int projectId, string revisionId);
+        string GetProjectPackagePath(int projectPackageId, string revisionId, int packagerId);
         string GetNugetPath();
         string GetNpmPath();
         string GetMSBuildPath();

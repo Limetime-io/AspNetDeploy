@@ -4,9 +4,8 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="61eaa0c85af947d68e243b5492cf8488" Name="Diagram1" ZoomLevel="60">
-        <EntityTypeShape EntityType="AspNetDeployModel.Bundle" Width="1.5" PointX="14.875" PointY="10.375" />
-        <EntityTypeShape EntityType="AspNetDeployModel.BundleVersion" Width="1.5" PointX="10.75" PointY="10.75" />
+      <Diagram DiagramId="61eaa0c85af947d68e243b5492cf8488" Name="Diagram1" ZoomLevel="89">
+        <EntityTypeShape EntityType="AspNetDeployModel.Bundle" Width="1.5" PointX="15.125" PointY="10.125" />
         <EntityTypeShape EntityType="AspNetDeployModel.DeploymentStep" Width="2" PointX="4.375" PointY="10" />
         <EntityTypeShape EntityType="AspNetDeployModel.DeploymentStepProperty" Width="2.375" PointX="1.125" PointY="10" />
         <EntityTypeShape EntityType="AspNetDeployModel.Environment" Width="1.75" PointX="5.125" PointY="23.125" />
@@ -15,19 +14,14 @@
         <EntityTypeShape EntityType="AspNetDeployModel.MachineRole" Width="1.5" PointX="5.25" PointY="16.5" />
         <EntityTypeShape EntityType="AspNetDeployModel.Project" Width="1.5" PointX="12.375" PointY="7.125" />
         <EntityTypeShape EntityType="AspNetDeployModel.ProjectProperty" Width="1.5" PointX="14.875" PointY="7.375" />
-        <EntityTypeShape EntityType="AspNetDeployModel.ProjectVersion" Width="1.875" PointX="9.5" PointY="6.375" />
         <EntityTypeShape EntityType="AspNetDeployModel.SourceControl" Width="1.5" PointX="12.375" PointY="3.375" />
         <EntityTypeShape EntityType="AspNetDeployModel.SourceControlProperty" Width="1.5" PointX="14.5" PointY="3.625" />
         <EntityTypeShape EntityType="AspNetDeployModel.SourceControlVersion" Width="2.375" PointX="9.5" PointY="2.125" />
         <EntityTypeShape EntityType="AspNetDeployModel.SourceControlVersionProperty" Width="2.625" PointX="5.875" PointY="3.375" />
-        <AssociationConnector Association="AspNetDeployModel.FK_BundleVersion_Bundle" />
-        <AssociationConnector Association="AspNetDeployModel.FK_DeploymentStep_BundleVersion" />
         <AssociationConnector Association="AspNetDeployModel.FK_DeploymentStep_DeploymentStep" />
         <AssociationConnector Association="AspNetDeployModel.FK_DeploymentStepProperty_DeploymentStep" />
         <AssociationConnector Association="AspNetDeployModel.FK_Project_SourceControl" />
         <AssociationConnector Association="AspNetDeployModel.FK_ProjectProperty_Project" />
-        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersion_Project" />
-        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion" />
         <AssociationConnector Association="AspNetDeployModel.FK_SourceControlProperty_SourceControl" />
         <AssociationConnector Association="AspNetDeployModel.FK_SourceControlVersion_SourceControl" />
         <AssociationConnector Association="AspNetDeployModel.FK_SourceControlVersionProperty_SourceControlVersion" />
@@ -35,18 +29,14 @@
         <AssociationConnector Association="AspNetDeployModel.MachineToEnvironment" />
         <AssociationConnector Association="AspNetDeployModel.MachineToMachineRole" />
         <AssociationConnector Association="AspNetDeployModel.ProjectToBundle" />
-        <AssociationConnector Association="AspNetDeployModel.ProjectVersionToBundleVersion" />
         <AssociationConnector Association="AspNetDeployModel.SourceControlToGroup" />
-        <EntityTypeShape EntityType="AspNetDeployModel.Package" Width="1.75" PointX="7.625" PointY="13.125" />
+        <EntityTypeShape EntityType="AspNetDeployModel.Package" Width="1.75" PointX="7.125" PointY="13.125" />
         <EntityTypeShape EntityType="AspNetDeployModel.Publication" Width="2" PointX="9.625" PointY="17.75" />
-        <AssociationConnector Association="AspNetDeployModel.FK_Package_BundleVersion" />
         <AssociationConnector Association="AspNetDeployModel.FK_Publication_Environment" />
         <AssociationConnector Association="AspNetDeployModel.FK_Publication_Package" />
-        <EntityTypeShape EntityType="AspNetDeployModel.BundleVersionProperty" Width="1.5" PointX="14.875" PointY="13" />
+        <EntityTypeShape EntityType="AspNetDeployModel.BundleVersionProperty" Width="1.5" PointX="15.125" PointY="13.125" />
         <EntityTypeShape EntityType="AspNetDeployModel.ProjectVersionProperty" Width="1.5" PointX="6.625" PointY="7" />
-        <AssociationConnector Association="AspNetDeployModel.FK_BundleVersionProperty_BundleVersion" />
-        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersionProperty_ProjectVersion" />
-        <EntityTypeShape EntityType="AspNetDeployModel.MachinePublication" Width="2.375" PointX="13" PointY="16.625" />
+        <EntityTypeShape EntityType="AspNetDeployModel.MachinePublication" Width="2.375" PointX="13.25" PointY="17.25" />
         <EntityTypeShape EntityType="AspNetDeployModel.MachinePublicationLog" Width="2.5" PointX="16.125" PointY="15.5" />
         <EntityTypeShape EntityType="AspNetDeployModel.MachinePublicationProperty" Width="2.375" PointX="16.25" PointY="18.5" />
         <AssociationConnector Association="AspNetDeployModel.FK_MachinePublication_Machine" />
@@ -57,18 +47,15 @@
         <AssociationConnector Association="AspNetDeployModel.FK_EnvironmentProperty_Environment" />
         <AssociationConnector Association="AspNetDeployModel.NextEnvironment" />
         <EntityTypeShape EntityType="AspNetDeployModel.DataField" Width="1.5" PointX="2.75" PointY="15.875" />
-        <AssociationConnector Association="AspNetDeployModel.DataFieldToBundleVersion" />
         <EntityTypeShape EntityType="AspNetDeployModel.PackageApprovedOnEnvironment" Width="1.5" PointX="8.25" PointY="23.125" />
         <AssociationConnector Association="AspNetDeployModel.FK_PackageApprovedOnEnvironment_Environment" />
         <AssociationConnector Association="AspNetDeployModel.FK_PackageApprovedOnEnvironment_Package" />
         <EntityTypeShape EntityType="AspNetDeployModel.User" Width="1.5" PointX="10.75" PointY="22.5" />
         <AssociationConnector Association="AspNetDeployModel.FK_PackageApprovedOnEnvironment_User" />
         <AssociationConnector Association="AspNetDeployModel.FK_Publication_User" />
-        <AssociationConnector Association="AspNetDeployModel.FK_BundleVersion_BundleVersion" />
         <AssociationConnector Association="AspNetDeployModel.FK_SourceControlVersion_SourceControlVersion" />
         <EntityTypeShape EntityType="AspNetDeployModel.PackageEntry" Width="1.5" PointX="7.125" PointY="9.5" />
         <AssociationConnector Association="AspNetDeployModel.FK_PackageEntry_Package" />
-        <AssociationConnector Association="AspNetDeployModel.FK_PackageEntry_ProjectVersion" />
         <EntityTypeShape EntityType="AspNetDeployModel.AspNetDeployExceptionEntry" Width="2.375" PointX="20.25" PointY="18.125" />
         <EntityTypeShape EntityType="AspNetDeployModel.ExceptionEntryData" Width="2.625" PointX="23.875" PointY="14.75" />
         <AssociationConnector Association="AspNetDeployModel.FK_AspNetDeployException_User" />
@@ -81,16 +68,27 @@
         <AssociationConnector Association="AspNetDeployModel.FK_DataFieldValue_DataField" />
         <AssociationConnector Association="AspNetDeployModel.FK_DataFieldValue_Environment" />
         <AssociationConnector Association="AspNetDeployModel.FK_DataFieldValue_Machine" />
-        <EntityTypeShape EntityType="AspNetDeployModel.EnvironmentChain" Width="1.5" PointX="13" PointY="20.375" />
-        <AssociationConnector Association="AspNetDeployModel.FK_EnvironmentChain_BundleVersion" />
-        <AssociationConnector Association="AspNetDeployModel.FK_EnvironmentChain_Environment_Next" />
-        <AssociationConnector Association="AspNetDeployModel.FK_EnvironmentChain_Environment_Source" />
         <EntityTypeShape EntityType="AspNetDeployModel.Revision" Width="1.5" PointX="12.625" PointY="27.5" />
         <EntityTypeShape EntityType="AspNetDeployModel.RevisionInfo" Width="1.5" PointX="14.875" PointY="27.75" />
         <AssociationConnector Association="AspNetDeployModel.FK_Revision_Revision" />
         <AssociationConnector Association="AspNetDeployModel.FK_Revision_SourceControlVersion1" />
         <AssociationConnector Association="AspNetDeployModel.FK_RevisionInfo_Revision" />
         <AssociationConnector Association="AspNetDeployModel.FK_Revision_SourceControl" />
+        <EntityTypeShape EntityType="AspNetDeployModel.BundleVersion" Width="2.625" PointX="9.875" PointY="12.75" />
+        <EntityTypeShape EntityType="AspNetDeployModel.ProjectVersion" Width="2.25" PointX="9.5" PointY="6.25" />
+        <EntityTypeShape EntityType="AspNetDeployModel.ProjectVersionToBundleVersion" Width="2.375" PointX="9.875" PointY="10.125" />
+        <AssociationConnector Association="AspNetDeployModel.FK_BundleVersion_Bundle" />
+        <AssociationConnector Association="AspNetDeployModel.FK_BundleVersion_BundleVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_BundleVersionProperty_BundleVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_DeploymentStep_BundleVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_Package_BundleVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersionToBundleVersion_BundleVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_PackageEntry_ProjectVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersion_Project" />
+        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersionProperty_ProjectVersion" />
+        <AssociationConnector Association="AspNetDeployModel.FK_ProjectVersionToBundleVersion_ProjectVersion" />
+        <AssociationConnector Association="AspNetDeployModel.DataFieldToBundleVersion" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

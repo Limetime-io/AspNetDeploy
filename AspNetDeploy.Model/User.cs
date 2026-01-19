@@ -26,11 +26,11 @@ namespace AspNetDeploy.Model
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public string ThemeId { get; set; }
         public UserRole Role { get; set; }
         public bool IsDisabled { get; set; }
         public string ApiKey { get; set; }
         public bool IsOnline { get; set; }
-        public string ThemeId { get; set; }
     
         public virtual ICollection<PackageApprovedOnEnvironment> PackageApprovedOnEnvironment { get; set; }
         public virtual ICollection<Publication> Publication { get; set; }

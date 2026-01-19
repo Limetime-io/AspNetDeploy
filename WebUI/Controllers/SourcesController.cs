@@ -79,7 +79,7 @@ namespace AspNetDeploy.WebUI.Controllers
         {
             ProjectVersion projectVersion = this.Entities.ProjectVersion
                 .Include("Project")
-                .Include("BundleVersions")
+                .Include("ProjectVersionToBundleVersion.BundleVersion")
                 .Include("SourceControlVersion.Properties")
                 .Include("SourceControlVersion.SourceControl.Properties")
                 .First(pv => pv.Id == id);
@@ -129,7 +129,7 @@ namespace AspNetDeploy.WebUI.Controllers
 
             SourceControlVersion sourceControlVersion = this.Entities.SourceControlVersion
                 .Include("Properties")
-                .Include("ProjectVersions.BundleVersions")
+                .Include("ProjectVersions.ProjectVersionTobundleVersion.BundleVersion")
                 .First(sc => sc.Id == id);
 
             if (sourceControlVersion.ArchiveState == SourceControlVersionArchiveState.Archived ||

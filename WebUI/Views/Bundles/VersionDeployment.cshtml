@@ -120,7 +120,7 @@
 
 @helper RednerDeployWebSiteStep(BundleVersion bundleVersion, DeploymentStep deploymentStep, int stepCounter)
 {
-    ProjectVersion projectVersion = bundleVersion.ProjectVersions.First(p => p.Id == deploymentStep.GetIntProperty("ProjectId", 0));
+    ProjectVersion projectVersion = bundleVersion.ProjectVersionToBundleVersion.First(p => p.ProjectVersionId == deploymentStep.GetIntProperty("ProjectId", 0)).ProjectVersion;
 
     <h2>
         <div class="row">
@@ -190,7 +190,7 @@
 
 @helper RenderRunVsTestsStep(BundleVersion bundleVersion, DeploymentStep deploymentStep, int stepCounter)
 {
-    ProjectVersion projectVersion = bundleVersion.ProjectVersions.First(p => p.Id == deploymentStep.GetIntProperty("ProjectId", 0));
+ProjectVersion projectVersion = bundleVersion.ProjectVersionToBundleVersion.First(p => p.ProjectVersionId == deploymentStep.GetIntProperty("ProjectId", 0)).ProjectVersion;
 
     <h2>
         <div class="row">
@@ -222,7 +222,7 @@
 
 @helper RenderDacpacStep(BundleVersion bundleVersion, DeploymentStep deploymentStep, int stepCounter)
 {
-    ProjectVersion projectVersion = bundleVersion.ProjectVersions.First(p => p.Id == deploymentStep.GetIntProperty("ProjectId", 0));
+ProjectVersion projectVersion = bundleVersion.ProjectVersionToBundleVersion.First(p => p.ProjectVersionId == deploymentStep.GetIntProperty("ProjectId", 0)).ProjectVersion;
 
     <h2>
         <div class="row">
@@ -275,7 +275,7 @@
 
 @helper RenderCopyFilesStep(BundleVersion bundleVersion, DeploymentStep deploymentStep, int stepCounter)
 {
-    ProjectVersion projectVersion = bundleVersion.ProjectVersions.First(p => p.Id == deploymentStep.GetIntProperty("ProjectId", 0));
+    ProjectVersion projectVersion = bundleVersion.ProjectVersionToBundleVersion.First(p => p.ProjectVersionId == deploymentStep.GetIntProperty("ProjectId", 0)).ProjectVersion;
 
     <h2>
         <div class="row">
@@ -309,7 +309,7 @@
 
 @helper RenderSourceFilesStep(BundleVersion bundleVersion, DeploymentStep deploymentStep, int stepCounter)
 {
-    ProjectVersion projectVersion = bundleVersion.ProjectVersions.First(p => p.Id == deploymentStep.GetIntProperty("ProjectId", 0));
+    ProjectVersion projectVersion = bundleVersion.ProjectVersionToBundleVersion.First(p => p.ProjectVersionId == deploymentStep.GetIntProperty("ProjectId", 0)).ProjectVersion;
 
     <h2>
         <div class="row">

@@ -693,6 +693,7 @@ namespace AspNetDeploy.WebUI.Controllers
             deploymentStep.SetStringProperty("Container.RestartPolicy", model.RestartPolicy);
             deploymentStep.SetStringProperty("Container.Networks", model.Networks);
 
+            this.UpdateProjectReference(model);
             this.SaveRoles(model, deploymentStep);
 
             this.Entities.SaveChanges();
@@ -780,15 +781,15 @@ namespace AspNetDeploy.WebUI.Controllers
         private void UpdateProjectReference(ProjectRelatedDeploymentStepModel model)
         {
             BundleVersion bundleVersion = this.Entities.BundleVersion
-                .Include("ProjectVersions")
+                .Include("ProjectVersionTobundleVersion.ProjectVersion")
                 .Include("DeploymentSteps.Properties")
                 .First(bv => bv.Id == model.BundleVersionId);
 
-            foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions.ToList())
+            foreach (ProjectVersionToBundleVersion link in bundleVersion.ProjectVersionToBundleVersion.ToList())
             {
-                if (bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != projectVersion.Id))
+                if (bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != link.ProjectVersionId))
                 {
-                    bundleVersion.ProjectVersions.Remove(projectVersion);
+                    this.Entities.ProjectVersionToBundleVersion.Remove(link);
                 }
             }
 
@@ -796,9 +797,27 @@ namespace AspNetDeploy.WebUI.Controllers
             {
                 ProjectVersion projectVersion = this.Entities.ProjectVersion.First(pv => pv.Id == model.ProjectId);
 
-                if (!bundleVersion.ProjectVersions.Contains(projectVersion))
+                ProjectVersionToBundleVersion newLink = new ProjectVersionToBundleVersion();
+
+                newLink.BundleVersion = bundleVersion;
+                newLink.ProjectVersionId = model.ProjectId;
+
+                if (model is ContainerDeploymentStepModel)
                 {
-                    bundleVersion.ProjectVersions.Add(projectVersion);
+                    newLink.PackagerId = (int)PackagerType.Docker;
+                }
+                else
+                {
+                    newLink.PackagerId = null;
+                }
+
+                if (!this.Entities.ProjectVersionToBundleVersion.Any(x => 
+                    x.BundleVersionId == bundleVersion.Id &&
+                    x.ProjectVersionId == newLink.ProjectVersionId &&
+                    x.PackagerId == newLink.PackagerId
+                ))
+                {
+                    this.Entities.ProjectVersionToBundleVersion.Add(newLink);
                 }
             }
         }

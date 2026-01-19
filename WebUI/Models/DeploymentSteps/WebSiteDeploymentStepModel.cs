@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AspNetDeploy.WebUI.Models.DeploymentSteps
+﻿namespace AspNetDeploy.WebUI.Models.DeploymentSteps
 {
     public class WebSiteDeploymentStepModel : ProjectRelatedDeploymentStepModel
     {

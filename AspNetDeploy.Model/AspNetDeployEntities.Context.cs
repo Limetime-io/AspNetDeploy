@@ -26,7 +26,6 @@ namespace AspNetDeploy.Model
         }
     
         public virtual DbSet<Bundle> Bundle { get; set; }
-        public virtual DbSet<BundleVersion> BundleVersion { get; set; }
         public virtual DbSet<DeploymentStep> DeploymentStep { get; set; }
         public virtual DbSet<DeploymentStepProperty> DeploymentStepProperty { get; set; }
         public virtual DbSet<Environment> Environment { get; set; }
@@ -35,7 +34,6 @@ namespace AspNetDeploy.Model
         public virtual DbSet<MachineRole> MachineRole { get; set; }
         public virtual DbSet<Project> Project { get; set; }
         public virtual DbSet<ProjectProperty> ProjectProperty { get; set; }
-        public virtual DbSet<ProjectVersion> ProjectVersion { get; set; }
         public virtual DbSet<SourceControl> SourceControl { get; set; }
         public virtual DbSet<SourceControlProperty> SourceControlProperty { get; set; }
         public virtual DbSet<SourceControlVersion> SourceControlVersion { get; set; }
@@ -56,8 +54,10 @@ namespace AspNetDeploy.Model
         public virtual DbSet<ExceptionEntryData> ExceptionEntryData { get; set; }
         public virtual DbSet<ExceptionEntry> ExceptionEntry { get; set; }
         public virtual DbSet<DataFieldValue> DataFieldValue { get; set; }
-        public virtual DbSet<EnvironmentChain> EnvironmentChain { get; set; }
         public virtual DbSet<Revision> Revision { get; set; }
         public virtual DbSet<RevisionInfo> RevisionInfo { get; set; }
+        public virtual DbSet<BundleVersion> BundleVersion { get; set; }
+        public virtual DbSet<ProjectVersion> ProjectVersion { get; set; }
+        public virtual DbSet<ProjectVersionToBundleVersion> ProjectVersionToBundleVersion { get; set; }
     }
 }

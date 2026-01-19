@@ -26,9 +26,9 @@ namespace AspNetDeploy.Model
         public System.DateTime CreatedDate { get; set; }
         public Nullable<System.DateTime> PackageDate { get; set; }
     
-        public virtual BundleVersion BundleVersion { get; set; }
         public virtual ICollection<Publication> Publications { get; set; }
         public virtual ICollection<PackageApprovedOnEnvironment> ApprovedOnEnvironments { get; set; }
         public virtual ICollection<PackageEntry> PackageEntry { get; set; }
+        public virtual BundleVersion BundleVersion { get; set; }
     }
 }

@@ -27,10 +27,10 @@ namespace AspNetDeploy.Model
         public int OrderIndex { get; set; }
         public DeploymentStepType Type { get; set; }
     
-        public virtual BundleVersion BundleVersion { get; set; }
         public virtual ICollection<DeploymentStep> ChildSteps { get; set; }
         public virtual DeploymentStep Parent { get; set; }
         public virtual ICollection<DeploymentStepProperty> Properties { get; set; }
         public virtual ICollection<MachineRole> MachineRoles { get; set; }
+        public virtual BundleVersion BundleVersion { get; set; }
     }
 }

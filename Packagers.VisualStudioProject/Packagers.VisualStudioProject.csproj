@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseProjectPackager.cs" />
+    <Compile Include="DotNetDockerProjectPackager.cs" />
     <Compile Include="DotNetCoreProjectPackager.cs" />
     <Compile Include="VisualStudioPackagerException.cs" />
     <Compile Include="VisualStudioProjectPackager.cs" />

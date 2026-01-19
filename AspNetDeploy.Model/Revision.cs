@@ -25,6 +25,7 @@ namespace AspNetDeploy.Model
         public int SourceControlId { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public Nullable<int> ParentRevisionId { get; set; }
+        public string Author { get; set; }
     
         public virtual ICollection<Revision> ChildRevisions { get; set; }
         public virtual Revision ParentRevision { get; set; }

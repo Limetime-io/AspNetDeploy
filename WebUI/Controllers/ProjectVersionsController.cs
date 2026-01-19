@@ -15,7 +15,7 @@ namespace AspNetDeploy.WebUI.Controllers
         {
             ProjectVersion projectVersion = this.Entities.ProjectVersion
                 .Include("Project")
-                .Include("BundleVersions")
+                .Include("ProjectVersionToBundleVersion.BundleVersion")
                 .Include("SourceControlVersion.Properties")
                 .Include("SourceControlVersion.SourceControl.Properties")
                 .First(pv => pv.Id == id);

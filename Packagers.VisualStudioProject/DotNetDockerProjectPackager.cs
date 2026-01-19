@@ -6,7 +6,7 @@ using Ionic.Zip;
 
 namespace Packagers.VisualStudioProject
 {
-    public class DotNetCoreProjectPackager : VisualStudioProjectPackager
+    public class DotNetDockerProjectPackager : VisualStudioProjectPackager
     {
         protected override void PackageProjectContents(ZipFile zipFile, XDocument xDocument, XNamespace vsNamespace, string projectRootFolder)
         {
@@ -22,6 +22,8 @@ namespace Packagers.VisualStudioProject
                 throw new VisualStudioPackagerException("targetFramework not supported: " + targetFramework.Value);
             }
 
+            // TODO: CREATE DOCKER IMAGE
+
             AddProjectDirectory(
                 zipFile,
                 projectRootFolder,
@@ -31,46 +33,6 @@ namespace Packagers.VisualStudioProject
 
         private bool IsFrameworkSupported(string targetFramework)
         {
-            if (targetFramework.Equals("netcoreapp2.0", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            if (targetFramework.Equals("netcoreapp2.1", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            if (targetFramework.Equals("netcoreapp2.2", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            if (targetFramework.Equals("netcoreapp2.3", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            if (targetFramework.Equals("netcoreapp7.0", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            if (targetFramework.Equals("net5.0", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            if (targetFramework.Equals("net6.0", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            if (targetFramework.Equals("net7.0", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-
             if (targetFramework.Equals("net8.0", StringComparison.InvariantCultureIgnoreCase))
             {
                 return true;

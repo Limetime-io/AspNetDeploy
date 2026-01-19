@@ -140,7 +140,7 @@ namespace ThreadHostedTaskRunner
             List<BundleVersion> bundleVersions = entities.BundleVersion
                 .Include("Properties")
                 .Include("Packages.Publications.Environment")
-                .Include("ProjectVersions.SourceControlVersion.Properties")
+                .Include("ProjectVersionTobundleVersion.ProjectVersion.SourceControlVersion.Properties")
                 .Where(bv => !bv.IsDeleted)
                 .ToList();
 
@@ -148,7 +148,7 @@ namespace ThreadHostedTaskRunner
                 .Where(bv => 
                     bv.GetIntProperty("AutoDeployToEnvironment") > 0 && 
                     bv.Packages.Any() &&
-                    bv.ProjectVersions.All(pv => pv.SourceControlVersion.ArchiveState == SourceControlVersionArchiveState.Normal))
+                    bv.ProjectVersionToBundleVersion.All(pv => pv.ProjectVersion.SourceControlVersion.ArchiveState == SourceControlVersionArchiveState.Normal))
                 .ToList();
 
             bundleVersionsWithAutoDeploy.ForEach(bundleVersion =>
@@ -187,36 +187,36 @@ namespace ThreadHostedTaskRunner
         private static void PackageBundles(AspNetDeployEntities entities)
         {
             List<BundleVersion> bundleVersions = entities.BundleVersion
-                .Include("ProjectVersions.SourceControlVersion.Properties")
+                .Include("ProjectVersionToBundleVersion.ProjectVersion.SourceControlVersion.Properties")
                 .Where(bv => !bv.IsDeleted)
                 .ToList();
 
-            List<ProjectVersion> projectVersions = bundleVersions
-                .SelectMany(scv => scv.ProjectVersions)
+            List<ProjectVersionToBundleVersion> projectVersionLinks = bundleVersions
+                .SelectMany(scv => scv.ProjectVersionToBundleVersion)
                 .Where(pv =>
-                        pv.ProjectType.HasFlag(ProjectType.WindowsApplication) ||
-                        pv.ProjectType.HasFlag(ProjectType.Database) ||
-                        pv.ProjectType.HasFlag(ProjectType.ZipArchive) ||
-                        pv.ProjectType.HasFlag(ProjectType.SourceFiles) ||
-                        pv.ProjectType.HasFlag(ProjectType.GulpFile) ||
-                        pv.ProjectType.HasFlag(ProjectType.Service) ||
-                        pv.ProjectType.HasFlag(ProjectType.Console) ||
-                        pv.ProjectType.HasFlag(ProjectType.Web)
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.WindowsApplication) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Database) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.ZipArchive) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.SourceFiles) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.GulpFile) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Service) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Console) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Web)
                 )
-                .Where(pv => 
-                    pv.SourceControlVersion.GetStringProperty("Revision") != pv.GetStringProperty("LastPackageRevision"))
+                .Where(pv =>
+                    pv.ProjectVersion.SourceControlVersion.ArchiveState == SourceControlVersionArchiveState.Normal
+                     &&
+                    (
+                        pv.ProjectVersion.ProjectType == ProjectType.ZipArchive ||
+                        pv.ProjectVersion.ProjectType == ProjectType.SourceFiles ||
+                        pv.ProjectVersion.GetStringProperty("LastBuildResult") == "Done"
+                    ) &&
+                    pv.ProjectVersion.SourceControlVersion.GetStringProperty("Revision") != pv.ProjectVersion.GetStringProperty("LastPackageRevision"))
                 .ToList();
 
-            List<BundleVersion> bundleVersionsToPack = projectVersions
-                .SelectMany( pv => pv.BundleVersions)
+            List<BundleVersion> bundleVersionsToPack = projectVersionLinks
+                .Select( pv => pv.BundleVersion)
                 .Distinct()
-                .Where( bv => bv.ProjectVersions.All( 
-                    pv => pv.SourceControlVersion.ArchiveState == SourceControlVersionArchiveState.Normal && 
-                    (
-                        pv.ProjectType == ProjectType.ZipArchive ||
-                        pv.ProjectType == ProjectType.SourceFiles ||
-                        pv.GetStringProperty("LastBuildResult") == "Done")
-                    ))
                 .ToList();
 
             List<BundleVersion> errorBundles = new List<BundleVersion>();
@@ -261,21 +261,22 @@ namespace ThreadHostedTaskRunner
         {
             List<BundleVersion> bundleVersions = entities.BundleVersion
                 .Include("Properties")
-                .Include("ProjectVersions.SourceControlVersion.Properties")
+                .Include("ProjectVersionTobundleVersion.ProjectVersion.SourceControlVersion.Properties")
                 .ToList();
 
             foreach (BundleVersion bundleVersion in bundleVersions)
             {
-                List<ProjectVersion> projectVersions = bundleVersion.ProjectVersions.Where(pv =>
+                List<ProjectVersion> projectVersions = bundleVersion.ProjectVersionToBundleVersion.Where(pv =>
                     (
-                        pv.ProjectType.HasFlag(ProjectType.Database) ||
-                        pv.ProjectType.HasFlag(ProjectType.WindowsApplication) ||
-                        pv.ProjectType.HasFlag(ProjectType.Service) ||
-                        pv.ProjectType.HasFlag(ProjectType.Console) ||
-                        pv.ProjectType.HasFlag(ProjectType.Web) ||
-                        pv.ProjectType.HasFlag(ProjectType.GulpFile) ||
-                        pv.ProjectType.HasFlag(ProjectType.Test) 
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Database) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.WindowsApplication) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Service) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Console) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Web) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.GulpFile) ||
+                        pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Test) 
                         ))
+                    .Select( pv => pv.ProjectVersion)
                     .ToList();
 
                 IList<ProjectVersion> errorProjects = projectVersions.Where(pv => pv.GetStringProperty("LastBuildResult") == "Error").ToList();
@@ -298,7 +299,7 @@ namespace ThreadHostedTaskRunner
                 }
 
                 List<BundleVersion> affectedBundleVersions = projectVersionsToRebuild
-                    .SelectMany(pv => pv.BundleVersions)
+                    .SelectMany(pv => pv.ProjectVersionToBundleVersion.Select( x => x.BundleVersion))
                     .Where(bv => !bv.IsDeleted)
                     .ToList();
 
@@ -328,7 +329,7 @@ namespace ThreadHostedTaskRunner
                     TaskRunnerContext.SetBundleVersionState(affectedBundleVersion.Id, BundleState.Idle);
                 }
 
-                if (bundleVersion.ProjectVersions.All(pv => TaskRunnerContext.GetProjectVersionState(pv.Id) == ProjectState.Idle))
+                if (bundleVersion.ProjectVersionToBundleVersion.All(pvx => TaskRunnerContext.GetProjectVersionState(pvx.ProjectVersionId) == ProjectState.Idle))
                 {
                     bundleVersion.SetStringProperty("LastBuildDuration", (DateTime.UtcNow - buildStartDate).TotalSeconds.ToString(CultureInfo.InvariantCulture));
                 }
@@ -375,7 +376,7 @@ namespace ThreadHostedTaskRunner
             List<SourceControlVersion> sourceControlVersions = entities.SourceControlVersion
                 .Include("ProjectVersions")
                 .Include("Properties")
-                .Include("ProjectVersions.BundleVersions")
+                .Include("ProjectVersions.ProjectVersionTobundleVersion.BundleVersion")
                 .Include("SourceControl.Properties")
                 .Where( scv => scv.ArchiveState == SourceControlVersionArchiveState.Normal)
                 .ToList();
@@ -386,7 +387,7 @@ namespace ThreadHostedTaskRunner
                     TaskRunnerContext.SetSourceControlVersionState(sourceControlVersion.Id, SourceControlState.Loading);
 
                     sourceControlVersion.ProjectVersions
-                        .SelectMany( pv => pv.BundleVersions)
+                        .SelectMany( pv => pv.ProjectVersionToBundleVersion.Select(x => x.BundleVersion))
                         .Where(bv => !bv.IsDeleted)
                         .ToList()
                         .ForEach(bv => TaskRunnerContext.SetBundleVersionState(bv.Id, BundleState.Loading));
@@ -408,7 +409,7 @@ namespace ThreadHostedTaskRunner
                     }
 
                     sourceControlVersion.ProjectVersions
-                        .SelectMany(pv => pv.BundleVersions)
+                        .SelectMany(pv => pv.ProjectVersionToBundleVersion.Select(x => x.BundleVersion))
                         .Where(bv => !bv.IsDeleted)
                         .ToList()
                         .ForEach(bv => TaskRunnerContext.SetBundleVersionState(bv.Id, BundleState.Idle));

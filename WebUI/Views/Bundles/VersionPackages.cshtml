@@ -255,9 +255,9 @@
 {
     <h3>@name</h3>
 
-    if (bundleVersion.ProjectVersions.Any(pv => pv.ProjectType.HasFlag(projectType)))
+    if (bundleVersion.ProjectVersionToBundleVersion.Any(pv => pv.ProjectVersion.ProjectType.HasFlag(projectType)))
     {
-        foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersions.Where(pv => pv.ProjectType.HasFlag(projectType)))
+        foreach (ProjectVersion projectVersion in bundleVersion.ProjectVersionToBundleVersion.Where(pv => pv.ProjectVersion.ProjectType.HasFlag(projectType)).Select(x => x.ProjectVersion))
         {
             <div class="row">
                 <div class="col-sm-6">

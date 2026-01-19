@@ -4,7 +4,7 @@
 	<edmx:Runtime>
 		<!-- SSDL content -->
 		<edmx:StorageModels>
-			<Schema Namespace="AspNetDeployModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+			<Schema Namespace="AspNetDeployModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
 				<EntityType Name="AspNetDeployException">
 					<Key>
 						<PropertyRef Name="Id" />
@@ -108,15 +108,6 @@
 					</Key>
 					<Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
 					<Property Name="Name" Type="nvarchar" MaxLength="1000" Nullable="false" />
-				</EntityType>
-				<EntityType Name="EnvironmentChain">
-					<Key>
-						<PropertyRef Name="Id" />
-					</Key>
-					<Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-					<Property Name="BundleVersionId" Type="int" Nullable="false" />
-					<Property Name="NextEnvironmentId" Type="int" Nullable="false" />
-					<Property Name="SourceEnvironmentId" Type="int" Nullable="false" />
 				</EntityType>
 				<EntityType Name="EnvironmentProperty">
 					<Key>
@@ -276,12 +267,11 @@
 				</EntityType>
 				<EntityType Name="ProjectToBundle">
 					<Key>
-						<PropertyRef Name="Id" />
+						<PropertyRef Name="ProjectId" />
+						<PropertyRef Name="BundleId" />
 					</Key>
-					<Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
 					<Property Name="ProjectId" Type="int" Nullable="false" />
 					<Property Name="BundleId" Type="int" Nullable="false" />
-					<Property Name="PackagerId" Type="int" />
 				</EntityType>
 				<EntityType Name="ProjectVersion">
 					<Key>
@@ -307,11 +297,12 @@
 				</EntityType>
 				<EntityType Name="ProjectVersionToBundleVersion">
 					<Key>
-						<PropertyRef Name="ProjectVersionId" />
-						<PropertyRef Name="BundleVersionId" />
+						<PropertyRef Name="Id" />
 					</Key>
+					<Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
 					<Property Name="ProjectVersionId" Type="int" Nullable="false" />
 					<Property Name="BundleVersionId" Type="int" Nullable="false" />
+					<Property Name="PackagerId" Type="int" />
 				</EntityType>
 				<EntityType Name="Publication">
 					<Key>
@@ -321,17 +312,18 @@
 					<Property Name="PackageId" Type="int" Nullable="false" />
 					<Property Name="EnvironmentId" Type="int" Nullable="false" />
 					<Property Name="CreatedDate" Type="datetime" Nullable="false" />
-					<Property Name="State" Type="int" Nullable="false" />
 					<Property Name="QueuedByUserId" Type="int" />
+					<Property Name="State" Type="int" Nullable="false" />
 				</EntityType>
 				<EntityType Name="Revision">
 					<Key>
 						<PropertyRef Name="Id" />
 					</Key>
 					<Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-					<Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
 					<Property Name="SourceControlId" Type="int" Nullable="false" />
+					<Property Name="Name" Type="nvarchar" MaxLength="150" Nullable="false" />
 					<Property Name="CreatedDate" Type="datetime" Nullable="false" />
+					<Property Name="Author" Type="nvarchar" MaxLength="150" />
 					<Property Name="ParentRevisionId" Type="int" />
 				</EntityType>
 				<EntityType Name="RevisionInfo">
@@ -340,8 +332,8 @@
 					</Key>
 					<Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
 					<Property Name="RevisionId" Type="int" Nullable="false" />
+					<Property Name="Author" Type="nvarchar" MaxLength="1000" Nullable="false" />
 					<Property Name="Message" Type="nvarchar" MaxLength="1000" Nullable="false" />
-					<Property Name="Author" Type="nvarchar" MaxLength="100" Nullable="false" />
 					<Property Name="CreatedDate" Type="datetime" Nullable="false" />
 				</EntityType>
 				<EntityType Name="SourceControl">
@@ -404,8 +396,8 @@
 					<Property Name="Role" Type="int" Nullable="false" />
 					<Property Name="IsDisabled" Type="bit" Nullable="false" />
 					<Property Name="ApiKey" Type="nvarchar" MaxLength="50" />
-					<Property Name="ThemeId" Type="nvarchar" MaxLength="50" />
 					<Property Name="IsOnline" Type="bit" Nullable="false" />
+					<Property Name="ThemeId" Type="nvarchar" MaxLength="50" />
 				</EntityType>
 				<Association Name="FK_AspNetDeployException_Exception">
 					<End Role="Exception" Type="Self.Exception" Multiplicity="1" />
@@ -586,42 +578,6 @@
 						</Principal>
 						<Dependent Role="DeploymentStepToMachineRole">
 							<PropertyRef Name="MachineRoleId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_EnvironmentChain_BundleVersion">
-					<End Role="BundleVersion" Type="Self.BundleVersion" Multiplicity="1" />
-					<End Role="EnvironmentChain" Type="Self.EnvironmentChain" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="BundleVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="EnvironmentChain">
-							<PropertyRef Name="BundleVersionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_EnvironmentChain_Environment_Next">
-					<End Role="Environment" Type="Self.Environment" Multiplicity="1" />
-					<End Role="EnvironmentChain" Type="Self.EnvironmentChain" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="Environment">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="EnvironmentChain">
-							<PropertyRef Name="NextEnvironmentId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_EnvironmentChain_Environment_Source">
-					<End Role="Environment" Type="Self.Environment" Multiplicity="1" />
-					<End Role="EnvironmentChain" Type="Self.EnvironmentChain" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="Environment">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="EnvironmentChain">
-							<PropertyRef Name="SourceEnvironmentId" />
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
@@ -1021,30 +977,6 @@
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
-				<Association Name="FK_Revision_SourceControlVersion1">
-					<End Role="SourceControlVersion" Type="Self.SourceControlVersion" Multiplicity="1" />
-					<End Role="Revision" Type="Self.Revision" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="SourceControlVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="Revision">
-							<PropertyRef Name="SourceControlId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_RevisionInfo_Revision">
-					<End Role="Revision" Type="Self.Revision" Multiplicity="1" />
-					<End Role="RevisionInfo" Type="Self.RevisionInfo" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="Revision">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="RevisionInfo">
-							<PropertyRef Name="RevisionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
 				<Association Name="FK_SourceControlProperty_SourceControl">
 					<End Role="SourceControl" Type="Self.SourceControl" Multiplicity="1" />
 					<End Role="SourceControlProperty" Type="Self.SourceControlProperty" Multiplicity="*" />
@@ -1129,7 +1061,6 @@
 					<EntitySet Name="DeploymentStepProperty" EntityType="Self.DeploymentStepProperty" Schema="dbo" store:Type="Tables" />
 					<EntitySet Name="DeploymentStepToMachineRole" EntityType="Self.DeploymentStepToMachineRole" Schema="dbo" store:Type="Tables" />
 					<EntitySet Name="Environment" EntityType="Self.Environment" Schema="dbo" store:Type="Tables" />
-					<EntitySet Name="EnvironmentChain" EntityType="Self.EnvironmentChain" Schema="dbo" store:Type="Tables" />
 					<EntitySet Name="EnvironmentProperty" EntityType="Self.EnvironmentProperty" Schema="dbo" store:Type="Tables" />
 					<EntitySet Name="Exception" EntityType="Self.Exception" Schema="dbo" store:Type="Tables" />
 					<EntitySet Name="ExceptionData" EntityType="Self.ExceptionData" Schema="dbo" store:Type="Tables" />
@@ -1219,18 +1150,6 @@
 					<AssociationSet Name="FK_DeploymentStepToMachineRole_MachineRole" Association="Self.FK_DeploymentStepToMachineRole_MachineRole">
 						<End Role="MachineRole" EntitySet="MachineRole" />
 						<End Role="DeploymentStepToMachineRole" EntitySet="DeploymentStepToMachineRole" />
-					</AssociationSet>
-					<AssociationSet Name="FK_EnvironmentChain_BundleVersion" Association="Self.FK_EnvironmentChain_BundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="EnvironmentChain" EntitySet="EnvironmentChain" />
-					</AssociationSet>
-					<AssociationSet Name="FK_EnvironmentChain_Environment_Next" Association="Self.FK_EnvironmentChain_Environment_Next">
-						<End Role="Environment" EntitySet="Environment" />
-						<End Role="EnvironmentChain" EntitySet="EnvironmentChain" />
-					</AssociationSet>
-					<AssociationSet Name="FK_EnvironmentChain_Environment_Source" Association="Self.FK_EnvironmentChain_Environment_Source">
-						<End Role="Environment" EntitySet="Environment" />
-						<End Role="EnvironmentChain" EntitySet="EnvironmentChain" />
 					</AssociationSet>
 					<AssociationSet Name="FK_EnvironmentProperty_Environment" Association="Self.FK_EnvironmentProperty_Environment">
 						<End Role="Environment" EntitySet="Environment" />
@@ -1364,14 +1283,6 @@
 						<End Role="Revision" EntitySet="Revision" />
 						<End Role="Revision1" EntitySet="Revision" />
 					</AssociationSet>
-					<AssociationSet Name="FK_Revision_SourceControlVersion1" Association="Self.FK_Revision_SourceControlVersion1">
-						<End Role="SourceControlVersion" EntitySet="SourceControlVersion" />
-						<End Role="Revision" EntitySet="Revision" />
-					</AssociationSet>
-					<AssociationSet Name="FK_RevisionInfo_Revision" Association="Self.FK_RevisionInfo_Revision">
-						<End Role="Revision" EntitySet="Revision" />
-						<End Role="RevisionInfo" EntitySet="RevisionInfo" />
-					</AssociationSet>
 					<AssociationSet Name="FK_SourceControlProperty_SourceControl" Association="Self.FK_SourceControlProperty_SourceControl">
 						<End Role="SourceControl" EntitySet="SourceControl" />
 						<End Role="SourceControlProperty" EntitySet="SourceControlProperty" />
@@ -1404,7 +1315,6 @@
 			<Schema Namespace="AspNetDeployModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
 				<EntityContainer Name="AspNetDeployEntities" annotation:LazyLoadingEnabled="true">
 					<EntitySet Name="Bundle" EntityType="AspNetDeployModel.Bundle" />
-					<EntitySet Name="BundleVersion" EntityType="AspNetDeployModel.BundleVersion" />
 					<EntitySet Name="DeploymentStep" EntityType="AspNetDeployModel.DeploymentStep" />
 					<EntitySet Name="DeploymentStepProperty" EntityType="AspNetDeployModel.DeploymentStepProperty" />
 					<EntitySet Name="Environment" EntityType="AspNetDeployModel.Environment" />
@@ -1413,19 +1323,10 @@
 					<EntitySet Name="MachineRole" EntityType="AspNetDeployModel.MachineRole" />
 					<EntitySet Name="Project" EntityType="AspNetDeployModel.Project" />
 					<EntitySet Name="ProjectProperty" EntityType="AspNetDeployModel.ProjectProperty" />
-					<EntitySet Name="ProjectVersion" EntityType="AspNetDeployModel.ProjectVersion" />
 					<EntitySet Name="SourceControl" EntityType="AspNetDeployModel.SourceControl" />
 					<EntitySet Name="SourceControlProperty" EntityType="AspNetDeployModel.SourceControlProperty" />
 					<EntitySet Name="SourceControlVersion" EntityType="AspNetDeployModel.SourceControlVersion" />
 					<EntitySet Name="SourceControlVersionProperty" EntityType="AspNetDeployModel.SourceControlVersionProperty" />
-					<AssociationSet Name="FK_BundleVersion_Bundle" Association="AspNetDeployModel.FK_BundleVersion_Bundle">
-						<End Role="Bundle" EntitySet="Bundle" />
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-					</AssociationSet>
-					<AssociationSet Name="FK_DeploymentStep_BundleVersion" Association="AspNetDeployModel.FK_DeploymentStep_BundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="DeploymentStep" EntitySet="DeploymentStep" />
-					</AssociationSet>
 					<AssociationSet Name="FK_DeploymentStep_DeploymentStep" Association="AspNetDeployModel.FK_DeploymentStep_DeploymentStep">
 						<End Role="DeploymentStep" EntitySet="DeploymentStep" />
 						<End Role="DeploymentStep1" EntitySet="DeploymentStep" />
@@ -1441,14 +1342,6 @@
 					<AssociationSet Name="FK_ProjectProperty_Project" Association="AspNetDeployModel.FK_ProjectProperty_Project">
 						<End Role="Project" EntitySet="Project" />
 						<End Role="ProjectProperty" EntitySet="ProjectProperty" />
-					</AssociationSet>
-					<AssociationSet Name="FK_ProjectVersion_Project" Association="AspNetDeployModel.FK_ProjectVersion_Project">
-						<End Role="Project" EntitySet="Project" />
-						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
-					</AssociationSet>
-					<AssociationSet Name="FK_ProjectVersion_SourceControlVersion" Association="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion">
-						<End Role="SourceControlVersion" EntitySet="SourceControlVersion" />
-						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
 					</AssociationSet>
 					<AssociationSet Name="FK_SourceControlProperty_SourceControl" Association="AspNetDeployModel.FK_SourceControlProperty_SourceControl">
 						<End Role="SourceControl" EntitySet="SourceControl" />
@@ -1478,20 +1371,12 @@
 						<End Role="Bundle" EntitySet="Bundle" />
 						<End Role="Project" EntitySet="Project" />
 					</AssociationSet>
-					<AssociationSet Name="ProjectVersionToBundleVersion" Association="AspNetDeployModel.ProjectVersionToBundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
-					</AssociationSet>
 					<AssociationSet Name="SourceControlToGroup" Association="AspNetDeployModel.SourceControlToGroup">
 						<End Role="Group" EntitySet="Group" />
 						<End Role="SourceControl" EntitySet="SourceControl" />
 					</AssociationSet>
 					<EntitySet Name="Package" EntityType="AspNetDeployModel.Package" />
 					<EntitySet Name="Publication" EntityType="AspNetDeployModel.Publication" />
-					<AssociationSet Name="FK_Package_BundleVersion" Association="AspNetDeployModel.FK_Package_BundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="Package" EntitySet="Package" />
-					</AssociationSet>
 					<AssociationSet Name="FK_Publication_Environment" Association="AspNetDeployModel.FK_Publication_Environment">
 						<End Role="Environment" EntitySet="Environment" />
 						<End Role="Publication" EntitySet="Publication" />
@@ -1502,14 +1387,6 @@
 					</AssociationSet>
 					<EntitySet Name="BundleVersionProperty" EntityType="AspNetDeployModel.BundleVersionProperty" />
 					<EntitySet Name="ProjectVersionProperty" EntityType="AspNetDeployModel.ProjectVersionProperty" />
-					<AssociationSet Name="FK_BundleVersionProperty_BundleVersion" Association="AspNetDeployModel.FK_BundleVersionProperty_BundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="BundleVersionProperty" EntitySet="BundleVersionProperty" />
-					</AssociationSet>
-					<AssociationSet Name="FK_ProjectVersionProperty_ProjectVersion" Association="AspNetDeployModel.FK_ProjectVersionProperty_ProjectVersion">
-						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
-						<End Role="ProjectVersionProperty" EntitySet="ProjectVersionProperty" />
-					</AssociationSet>
 					<EntitySet Name="MachinePublication" EntityType="AspNetDeployModel.MachinePublication" />
 					<EntitySet Name="MachinePublicationLog" EntityType="AspNetDeployModel.MachinePublicationLog" />
 					<EntitySet Name="MachinePublicationProperty" EntityType="AspNetDeployModel.MachinePublicationProperty" />
@@ -1539,10 +1416,6 @@
 						<End Role="Environment1" EntitySet="Environment" />
 					</AssociationSet>
 					<EntitySet Name="DataField" EntityType="AspNetDeployModel.DataField" />
-					<AssociationSet Name="DataFieldToBundleVersion" Association="AspNetDeployModel.DataFieldToBundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="DataField" EntitySet="DataField" />
-					</AssociationSet>
 					<EntitySet Name="PackageApprovedOnEnvironment" EntityType="AspNetDeployModel.PackageApprovedOnEnvironment" />
 					<AssociationSet Name="FK_PackageApprovedOnEnvironment_Environment" Association="AspNetDeployModel.FK_PackageApprovedOnEnvironment_Environment">
 						<End Role="Environment" EntitySet="Environment" />
@@ -1561,10 +1434,6 @@
 						<End Role="User" EntitySet="User" />
 						<End Role="Publication" EntitySet="Publication" />
 					</AssociationSet>
-					<AssociationSet Name="FK_BundleVersion_BundleVersion" Association="AspNetDeployModel.FK_BundleVersion_BundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="BundleVersion1" EntitySet="BundleVersion" />
-					</AssociationSet>
 					<AssociationSet Name="FK_SourceControlVersion_SourceControlVersion" Association="AspNetDeployModel.FK_SourceControlVersion_SourceControlVersion">
 						<End Role="SourceControlVersion" EntitySet="SourceControlVersion" />
 						<End Role="SourceControlVersion1" EntitySet="SourceControlVersion" />
@@ -1572,10 +1441,6 @@
 					<EntitySet Name="PackageEntry" EntityType="AspNetDeployModel.PackageEntry" />
 					<AssociationSet Name="FK_PackageEntry_Package" Association="AspNetDeployModel.FK_PackageEntry_Package">
 						<End Role="Package" EntitySet="Package" />
-						<End Role="PackageEntry" EntitySet="PackageEntry" />
-					</AssociationSet>
-					<AssociationSet Name="FK_PackageEntry_ProjectVersion" Association="AspNetDeployModel.FK_PackageEntry_ProjectVersion">
-						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
 						<End Role="PackageEntry" EntitySet="PackageEntry" />
 					</AssociationSet>
 					<EntitySet Name="AspNetDeployExceptionEntry" EntityType="AspNetDeployModel.AspNetDeployExceptionEntry" />
@@ -1614,19 +1479,6 @@
 						<End Role="Machine" EntitySet="Machine" />
 						<End Role="DataFieldValue" EntitySet="DataFieldValue" />
 					</AssociationSet>
-					<EntitySet Name="EnvironmentChain" EntityType="AspNetDeployModel.EnvironmentChain" />
-					<AssociationSet Name="FK_EnvironmentChain_BundleVersion" Association="AspNetDeployModel.FK_EnvironmentChain_BundleVersion">
-						<End Role="BundleVersion" EntitySet="BundleVersion" />
-						<End Role="EnvironmentChain" EntitySet="EnvironmentChain" />
-					</AssociationSet>
-					<AssociationSet Name="FK_EnvironmentChain_Environment_Next" Association="AspNetDeployModel.FK_EnvironmentChain_Environment_Next">
-						<End Role="Environment" EntitySet="Environment" />
-						<End Role="EnvironmentChain" EntitySet="EnvironmentChain" />
-					</AssociationSet>
-					<AssociationSet Name="FK_EnvironmentChain_Environment_Source" Association="AspNetDeployModel.FK_EnvironmentChain_Environment_Source">
-						<End Role="Environment" EntitySet="Environment" />
-						<End Role="EnvironmentChain" EntitySet="EnvironmentChain" />
-					</AssociationSet>
 					<EntitySet Name="Revision" EntityType="AspNetDeployModel.Revision" />
 					<EntitySet Name="RevisionInfo" EntityType="AspNetDeployModel.RevisionInfo" />
 					<AssociationSet Name="FK_Revision_Revision" Association="AspNetDeployModel.FK_Revision_Revision">
@@ -1640,6 +1492,57 @@
 					<AssociationSet Name="FK_RevisionInfo_Revision" Association="AspNetDeployModel.FK_RevisionInfo_Revision">
 						<End Role="Revision" EntitySet="Revision" />
 						<End Role="RevisionInfo" EntitySet="RevisionInfo" />
+					</AssociationSet>
+					<EntitySet Name="BundleVersion" EntityType="AspNetDeployModel.BundleVersion" />
+					<EntitySet Name="ProjectVersion" EntityType="AspNetDeployModel.ProjectVersion" />
+					<EntitySet Name="ProjectVersionToBundleVersion" EntityType="AspNetDeployModel.ProjectVersionToBundleVersion" />
+					<AssociationSet Name="FK_BundleVersion_Bundle" Association="AspNetDeployModel.FK_BundleVersion_Bundle">
+						<End Role="Bundle" EntitySet="Bundle" />
+						<End Role="BundleVersion" EntitySet="BundleVersion" />
+					</AssociationSet>
+					<AssociationSet Name="FK_BundleVersion_BundleVersion" Association="AspNetDeployModel.FK_BundleVersion_BundleVersion">
+						<End Role="BundleVersion" EntitySet="BundleVersion" />
+						<End Role="BundleVersion1" EntitySet="BundleVersion" />
+					</AssociationSet>
+					<AssociationSet Name="FK_BundleVersionProperty_BundleVersion" Association="AspNetDeployModel.FK_BundleVersionProperty_BundleVersion">
+						<End Role="BundleVersion" EntitySet="BundleVersion" />
+						<End Role="BundleVersionProperty" EntitySet="BundleVersionProperty" />
+					</AssociationSet>
+					<AssociationSet Name="FK_DeploymentStep_BundleVersion" Association="AspNetDeployModel.FK_DeploymentStep_BundleVersion">
+						<End Role="BundleVersion" EntitySet="BundleVersion" />
+						<End Role="DeploymentStep" EntitySet="DeploymentStep" />
+					</AssociationSet>
+					<AssociationSet Name="FK_Package_BundleVersion" Association="AspNetDeployModel.FK_Package_BundleVersion">
+						<End Role="BundleVersion" EntitySet="BundleVersion" />
+						<End Role="Package" EntitySet="Package" />
+					</AssociationSet>
+					<AssociationSet Name="FK_ProjectVersionToBundleVersion_BundleVersion" Association="AspNetDeployModel.FK_ProjectVersionToBundleVersion_BundleVersion">
+						<End Role="BundleVersion" EntitySet="BundleVersion" />
+						<End Role="ProjectVersionToBundleVersion" EntitySet="ProjectVersionToBundleVersion" />
+					</AssociationSet>
+					<AssociationSet Name="FK_PackageEntry_ProjectVersion" Association="AspNetDeployModel.FK_PackageEntry_ProjectVersion">
+						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
+						<End Role="PackageEntry" EntitySet="PackageEntry" />
+					</AssociationSet>
+					<AssociationSet Name="FK_ProjectVersion_Project" Association="AspNetDeployModel.FK_ProjectVersion_Project">
+						<End Role="Project" EntitySet="Project" />
+						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
+					</AssociationSet>
+					<AssociationSet Name="FK_ProjectVersion_SourceControlVersion" Association="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion">
+						<End Role="SourceControlVersion" EntitySet="SourceControlVersion" />
+						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
+					</AssociationSet>
+					<AssociationSet Name="FK_ProjectVersionProperty_ProjectVersion" Association="AspNetDeployModel.FK_ProjectVersionProperty_ProjectVersion">
+						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
+						<End Role="ProjectVersionProperty" EntitySet="ProjectVersionProperty" />
+					</AssociationSet>
+					<AssociationSet Name="FK_ProjectVersionToBundleVersion_ProjectVersion" Association="AspNetDeployModel.FK_ProjectVersionToBundleVersion_ProjectVersion">
+						<End Role="ProjectVersion" EntitySet="ProjectVersion" />
+						<End Role="ProjectVersionToBundleVersion" EntitySet="ProjectVersionToBundleVersion" />
+					</AssociationSet>
+					<AssociationSet Name="DataFieldToBundleVersion" Association="AspNetDeployModel.DataFieldToBundleVersion">
+						<End Role="BundleVersion" EntitySet="BundleVersion" />
+						<End Role="DataField" EntitySet="DataField" />
 					</AssociationSet>
 				</EntityContainer>
 				<EnumType Name="SourceControlType">
@@ -1659,23 +1562,23 @@
 					<Member Name="Test" Value="64" />
 					<Member Name="WindowsApplication" Value="128" />
 					<Member Name="ZipArchive" Value="256" />
-                                        <Member Name="GulpFile" Value="512" />
-                                        <Member Name="NetCore" Value="1024" />
-                                        <Member Name="SourceFiles" Value="2048" />
-                                </EnumType>
-                                <EnumType Name="DeploymentStepType">
-                                        <Member Name="Undefined" Value="0" />
-                                        <Member Name="DeployWebSite" Value="1" />
-                                        <Member Name="RunPowerShellScript" Value="2" />
-                                        <Member Name="CopyFiles" Value="3" />
-                                        <Member Name="Configuration" Value="4" />
-                                        <Member Name="UpdateHostsFile" Value="5" />
-                                        <Member Name="RunSQLScript" Value="6" />
-                                        <Member Name="DeployDacpac" Value="7" />
-                                        <Member Name="RunVsTests" Value="8" />
-                                        <Member Name="DeploySourceFiles" Value="9" />
-                                        <Member Name="DeployContainer" Value="10" />
-                                </EnumType>
+					<Member Name="GulpFile" Value="512" />
+					<Member Name="NetCore" Value="1024" />
+					<Member Name="SourceFiles" Value="2048" />
+				</EnumType>
+				<EnumType Name="DeploymentStepType">
+					<Member Name="Undefined" Value="0" />
+					<Member Name="DeployWebSite" Value="1" />
+					<Member Name="RunPowerShellScript" Value="2" />
+					<Member Name="CopyFiles" Value="3" />
+					<Member Name="Configuration" Value="4" />
+					<Member Name="UpdateHostsFile" Value="5" />
+					<Member Name="RunSQLScript" Value="6" />
+					<Member Name="DeployDacpac" Value="7" />
+					<Member Name="RunVsTests" Value="8" />
+					<Member Name="DeploySourceFiles" Value="9" />
+					<Member Name="DeployContainer" Value="10" />
+				</EnumType>
 				<EntityType Name="Bundle">
 					<Key>
 						<PropertyRef Name="Id" />
@@ -1683,32 +1586,10 @@
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
 					<Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-					<NavigationProperty Name="BundleVersions" Relationship="AspNetDeployModel.FK_BundleVersion_Bundle" FromRole="Bundle" ToRole="BundleVersion" />
 					<NavigationProperty Name="Projects" Relationship="AspNetDeployModel.ProjectToBundle" FromRole="Bundle" ToRole="Project" />
 					<Property Name="IsSingleInstance" Type="Boolean" Nullable="false" />
 					<Property Name="OrderIndex" Type="Int32" Nullable="false" />
-				</EntityType>
-				<EntityType Name="BundleVersion">
-					<Key>
-						<PropertyRef Name="Id" />
-					</Key>
-					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-					<Property Name="BundleId" Type="Int32" Nullable="false" />
-					<Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
-					<NavigationProperty Name="Bundle" Relationship="AspNetDeployModel.FK_BundleVersion_Bundle" FromRole="BundleVersion" ToRole="Bundle" />
-					<NavigationProperty Name="DeploymentSteps" Relationship="AspNetDeployModel.FK_DeploymentStep_BundleVersion" FromRole="BundleVersion" ToRole="DeploymentStep" />
-					<NavigationProperty Name="ProjectVersions" Relationship="AspNetDeployModel.ProjectVersionToBundleVersion" FromRole="BundleVersion" ToRole="ProjectVersion" />
-					<NavigationProperty Name="Packages" Relationship="AspNetDeployModel.FK_Package_BundleVersion" FromRole="BundleVersion" ToRole="Package" />
-					<Property Name="OrderIndex" Type="Int32" Nullable="false" />
-					<Property Name="IsHead" Type="Boolean" Nullable="false" />
-					<NavigationProperty Name="Properties" Relationship="AspNetDeployModel.FK_BundleVersionProperty_BundleVersion" FromRole="BundleVersion" ToRole="BundleVersionProperty" />
-					<NavigationProperty Name="DataFields" Relationship="AspNetDeployModel.DataFieldToBundleVersion" FromRole="BundleVersion" ToRole="DataField" />
-					<Property Name="ParentBundleVersionId" Type="Int32" />
-					<Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-					<NavigationProperty Name="ChildBundleVersions" Relationship="AspNetDeployModel.FK_BundleVersion_BundleVersion" FromRole="BundleVersion" ToRole="BundleVersion1" />
-					<NavigationProperty Name="ParentBundleVersion" Relationship="AspNetDeployModel.FK_BundleVersion_BundleVersion" FromRole="BundleVersion1" ToRole="BundleVersion" />
-					<Property Name="IsArchived" Type="Boolean" Nullable="false" />
-					<NavigationProperty Name="EnvironmentChain" Relationship="AspNetDeployModel.FK_EnvironmentChain_BundleVersion" FromRole="BundleVersion" ToRole="EnvironmentChain" />
+					<NavigationProperty Name="BundleVersions" Relationship="AspNetDeployModel.FK_BundleVersion_Bundle" FromRole="Bundle" ToRole="BundleVersion" />
 				</EntityType>
 				<EntityType Name="DeploymentStep">
 					<Key>
@@ -1719,11 +1600,11 @@
 					<Property Name="BundleVersionId" Type="Int32" Nullable="false" />
 					<Property Name="OrderIndex" Type="Int32" Nullable="false" />
 					<Property Name="Type" Type="AspNetDeployModel.DeploymentStepType" Nullable="false" />
-					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.FK_DeploymentStep_BundleVersion" FromRole="DeploymentStep" ToRole="BundleVersion" />
 					<NavigationProperty Name="ChildSteps" Relationship="AspNetDeployModel.FK_DeploymentStep_DeploymentStep" FromRole="DeploymentStep" ToRole="DeploymentStep1" />
 					<NavigationProperty Name="Parent" Relationship="AspNetDeployModel.FK_DeploymentStep_DeploymentStep" FromRole="DeploymentStep1" ToRole="DeploymentStep" />
 					<NavigationProperty Name="Properties" Relationship="AspNetDeployModel.FK_DeploymentStepProperty_DeploymentStep" FromRole="DeploymentStep" ToRole="DeploymentStepProperty" />
 					<NavigationProperty Name="MachineRoles" Relationship="AspNetDeployModel.DeploymentStepToMachineRole" FromRole="DeploymentStep" ToRole="MachineRole" />
+					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.FK_DeploymentStep_BundleVersion" FromRole="DeploymentStep" ToRole="BundleVersion" />
 				</EntityType>
 				<EntityType Name="DeploymentStepProperty">
 					<Key>
@@ -1748,8 +1629,6 @@
 					<NavigationProperty Name="NextEnvironment" Relationship="AspNetDeployModel.NextEnvironment" FromRole="Environment1" ToRole="Environment" />
 					<NavigationProperty Name="ApprovedPackages" Relationship="AspNetDeployModel.FK_PackageApprovedOnEnvironment_Environment" FromRole="Environment" ToRole="PackageApprovedOnEnvironment" />
 					<NavigationProperty Name="DataFieldValues" Relationship="AspNetDeployModel.FK_DataFieldValue_Environment" FromRole="Environment" ToRole="DataFieldValue" />
-					<NavigationProperty Name="EnvironmentChain" Relationship="AspNetDeployModel.FK_EnvironmentChain_Environment_Next" FromRole="Environment" ToRole="EnvironmentChain" />
-					<NavigationProperty Name="EnvironmentChain1" Relationship="AspNetDeployModel.FK_EnvironmentChain_Environment_Source" FromRole="Environment" ToRole="EnvironmentChain" />
 				</EntityType>
 				<EntityType Name="Group">
 					<Key>
@@ -1793,8 +1672,8 @@
 					<Property Name="Guid" Type="Guid" Nullable="false" />
 					<NavigationProperty Name="SourceControl" Relationship="AspNetDeployModel.FK_Project_SourceControl" FromRole="Project" ToRole="SourceControl" />
 					<NavigationProperty Name="Properties" Relationship="AspNetDeployModel.FK_ProjectProperty_Project" FromRole="Project" ToRole="ProjectProperty" />
-					<NavigationProperty Name="ProjectVersions" Relationship="AspNetDeployModel.FK_ProjectVersion_Project" FromRole="Project" ToRole="ProjectVersion" />
 					<NavigationProperty Name="Bundles" Relationship="AspNetDeployModel.ProjectToBundle" FromRole="Project" ToRole="Bundle" />
+					<NavigationProperty Name="ProjectVersions" Relationship="AspNetDeployModel.FK_ProjectVersion_Project" FromRole="Project" ToRole="ProjectVersion" />
 				</EntityType>
 				<EntityType Name="ProjectProperty">
 					<Key>
@@ -1805,24 +1684,6 @@
 					<Property Name="Key" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
 					<Property Name="Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
 					<NavigationProperty Name="Project" Relationship="AspNetDeployModel.FK_ProjectProperty_Project" FromRole="ProjectProperty" ToRole="Project" />
-				</EntityType>
-				<EntityType Name="ProjectVersion">
-					<Key>
-						<PropertyRef Name="Id" />
-					</Key>
-					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-					<Property Name="ProjectId" Type="Int32" Nullable="false" />
-					<Property Name="SourceControlVersionId" Type="Int32" Nullable="false" />
-					<NavigationProperty Name="Project" Relationship="AspNetDeployModel.FK_ProjectVersion_Project" FromRole="ProjectVersion" ToRole="Project" />
-					<NavigationProperty Name="SourceControlVersion" Relationship="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion" FromRole="ProjectVersion" ToRole="SourceControlVersion" />
-					<NavigationProperty Name="BundleVersions" Relationship="AspNetDeployModel.ProjectVersionToBundleVersion" FromRole="ProjectVersion" ToRole="BundleVersion" />
-					<Property Name="ProjectType" Type="AspNetDeployModel.ProjectType" Nullable="false" />
-					<Property Name="SolutionFile" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
-					<Property Name="ProjectFile" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
-					<Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-					<Property Name="Name" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
-					<NavigationProperty Name="Properties" Relationship="AspNetDeployModel.FK_ProjectVersionProperty_ProjectVersion" FromRole="ProjectVersion" ToRole="ProjectVersionProperty" />
-					<NavigationProperty Name="PackageEntries" Relationship="AspNetDeployModel.FK_PackageEntry_ProjectVersion" FromRole="ProjectVersion" ToRole="PackageEntry" />
 				</EntityType>
 				<EntityType Name="SourceControl">
 					<Key>
@@ -1855,7 +1716,6 @@
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="SourceControlId" Type="Int32" Nullable="false" />
 					<Property Name="Name" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
-					<NavigationProperty Name="ProjectVersions" Relationship="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion" FromRole="SourceControlVersion" ToRole="ProjectVersion" />
 					<NavigationProperty Name="SourceControl" Relationship="AspNetDeployModel.FK_SourceControlVersion_SourceControl" FromRole="SourceControlVersion" ToRole="SourceControl" />
 					<NavigationProperty Name="Properties" Relationship="AspNetDeployModel.FK_SourceControlVersionProperty_SourceControlVersion" FromRole="SourceControlVersion" ToRole="SourceControlVersionProperty" />
 					<Property Name="OrderIndex" Type="Int32" Nullable="false" />
@@ -1865,6 +1725,7 @@
 					<NavigationProperty Name="ParentSourceControlVersion" Relationship="AspNetDeployModel.FK_SourceControlVersion_SourceControlVersion" FromRole="SourceControlVersion1" ToRole="SourceControlVersion" />
 					<Property Name="ArchiveState" Type="AspNetDeployModel.SourceControlVersionArchiveState" Nullable="false" />
 					<NavigationProperty Name="Revisions" Relationship="AspNetDeployModel.FK_Revision_SourceControlVersion1" FromRole="SourceControlVersion" ToRole="Revision" />
+					<NavigationProperty Name="ProjectVersions" Relationship="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion" FromRole="SourceControlVersion" ToRole="ProjectVersion" />
 				</EntityType>
 				<EntityType Name="SourceControlVersionProperty">
 					<Key>
@@ -1876,30 +1737,6 @@
 					<Property Name="Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
 					<NavigationProperty Name="SourceControlVersion" Relationship="AspNetDeployModel.FK_SourceControlVersionProperty_SourceControlVersion" FromRole="SourceControlVersionProperty" ToRole="SourceControlVersion" />
 				</EntityType>
-				<Association Name="FK_BundleVersion_Bundle">
-					<End Type="AspNetDeployModel.Bundle" Role="Bundle" Multiplicity="1" />
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="Bundle">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="BundleVersion">
-							<PropertyRef Name="BundleId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_DeploymentStep_BundleVersion">
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
-					<End Type="AspNetDeployModel.DeploymentStep" Role="DeploymentStep" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="BundleVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="DeploymentStep">
-							<PropertyRef Name="BundleVersionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
 				<Association Name="FK_DeploymentStep_DeploymentStep">
 					<End Type="AspNetDeployModel.DeploymentStep" Role="DeploymentStep" Multiplicity="0..1" />
 					<End Type="AspNetDeployModel.DeploymentStep" Role="DeploymentStep1" Multiplicity="*" />
@@ -1948,30 +1785,6 @@
 						</Principal>
 						<Dependent Role="ProjectProperty">
 							<PropertyRef Name="ProjectId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_ProjectVersion_Project">
-					<End Type="AspNetDeployModel.Project" Role="Project" Multiplicity="1" />
-					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="Project">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="ProjectVersion">
-							<PropertyRef Name="ProjectId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_ProjectVersion_SourceControlVersion">
-					<End Type="AspNetDeployModel.SourceControlVersion" Role="SourceControlVersion" Multiplicity="1" />
-					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="SourceControlVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="ProjectVersion">
-							<PropertyRef Name="SourceControlVersionId" />
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
@@ -2027,10 +1840,6 @@
 					<End Type="AspNetDeployModel.Bundle" Role="Bundle" Multiplicity="*" />
 					<End Type="AspNetDeployModel.Project" Role="Project" Multiplicity="*" />
 				</Association>
-				<Association Name="ProjectVersionToBundleVersion">
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="*" />
-					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="*" />
-				</Association>
 				<Association Name="SourceControlToGroup">
 					<End Type="AspNetDeployModel.Group" Role="Group" Multiplicity="*" />
 					<End Type="AspNetDeployModel.SourceControl" Role="SourceControl" Multiplicity="*" />
@@ -2042,11 +1851,11 @@
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="BundleVersionId" Type="Int32" Nullable="false" />
 					<Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.FK_Package_BundleVersion" FromRole="Package" ToRole="BundleVersion" />
 					<NavigationProperty Name="Publications" Relationship="AspNetDeployModel.FK_Publication_Package" FromRole="Package" ToRole="Publication" />
 					<NavigationProperty Name="ApprovedOnEnvironments" Relationship="AspNetDeployModel.FK_PackageApprovedOnEnvironment_Package" FromRole="Package" ToRole="PackageApprovedOnEnvironment" />
 					<NavigationProperty Name="PackageEntry" Relationship="AspNetDeployModel.FK_PackageEntry_Package" FromRole="Package" ToRole="PackageEntry" />
 					<Property Name="PackageDate" Type="DateTime" Precision="3" />
+					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.FK_Package_BundleVersion" FromRole="Package" ToRole="BundleVersion" />
 				</EntityType>
 				<EntityType Name="Publication">
 					<Key>
@@ -2063,18 +1872,6 @@
 					<Property Name="QueuedByUserId" Type="Int32" />
 					<NavigationProperty Name="User" Relationship="AspNetDeployModel.FK_Publication_User" FromRole="Publication" ToRole="User" />
 				</EntityType>
-				<Association Name="FK_Package_BundleVersion">
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
-					<End Type="AspNetDeployModel.Package" Role="Package" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="BundleVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="Package">
-							<PropertyRef Name="BundleVersionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
 				<Association Name="FK_Publication_Environment">
 					<End Type="AspNetDeployModel.Environment" Role="Environment" Multiplicity="1" />
 					<End Type="AspNetDeployModel.Publication" Role="Publication" Multiplicity="*" />
@@ -2119,30 +1916,6 @@
 					<Property Name="Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
 					<NavigationProperty Name="ProjectVersion" Relationship="AspNetDeployModel.FK_ProjectVersionProperty_ProjectVersion" FromRole="ProjectVersionProperty" ToRole="ProjectVersion" />
 				</EntityType>
-				<Association Name="FK_BundleVersionProperty_BundleVersion">
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
-					<End Type="AspNetDeployModel.BundleVersionProperty" Role="BundleVersionProperty" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="BundleVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="BundleVersionProperty">
-							<PropertyRef Name="BundleVersionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_ProjectVersionProperty_ProjectVersion">
-					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="1" />
-					<End Type="AspNetDeployModel.ProjectVersionProperty" Role="ProjectVersionProperty" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="ProjectVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="ProjectVersionProperty">
-							<PropertyRef Name="ProjectVersionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
 				<EntityType Name="MachinePublication">
 					<Key>
 						<PropertyRef Name="Id" />
@@ -2274,13 +2047,9 @@
 					<Property Name="IsSensitive" Type="Boolean" Nullable="false" />
 					<Property Name="Mode" Type="AspNetDeployModel.DataFieldMode" Nullable="false" />
 					<Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-					<NavigationProperty Name="BundleVersions" Relationship="AspNetDeployModel.DataFieldToBundleVersion" FromRole="DataField" ToRole="BundleVersion" />
 					<NavigationProperty Name="DataFieldValues" Relationship="AspNetDeployModel.FK_DataFieldValue_DataField" FromRole="DataField" ToRole="DataFieldValue" />
+					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.DataFieldToBundleVersion" FromRole="DataField" ToRole="BundleVersion" />
 				</EntityType>
-				<Association Name="DataFieldToBundleVersion">
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="*" />
-					<End Type="AspNetDeployModel.DataField" Role="DataField" Multiplicity="*" />
-				</Association>
 				<EnumType Name="DataFieldMode">
 					<Member Name="Undefined" Value="0" />
 					<Member Name="BundlePrivate" Value="1" />
@@ -2389,18 +2158,6 @@
 					<Member Name="DeploymentStepRollbackComplete" Value="301" />
 					<Member Name="DeploymentStepRollbackError" Value="310" />
 				</EnumType>
-				<Association Name="FK_BundleVersion_BundleVersion">
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="0..1" />
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion1" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="BundleVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="BundleVersion1">
-							<PropertyRef Name="ParentBundleVersionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
 				<Association Name="FK_SourceControlVersion_SourceControlVersion">
 					<End Type="AspNetDeployModel.SourceControlVersion" Role="SourceControlVersion" Multiplicity="0..1" />
 					<End Type="AspNetDeployModel.SourceControlVersion" Role="SourceControlVersion1" Multiplicity="*" />
@@ -2433,18 +2190,6 @@
 						</Principal>
 						<Dependent Role="PackageEntry">
 							<PropertyRef Name="PackageId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_PackageEntry_ProjectVersion">
-					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="1" />
-					<End Type="AspNetDeployModel.PackageEntry" Role="PackageEntry" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="ProjectVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="PackageEntry">
-							<PropertyRef Name="ProjectVersionId" />
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
@@ -2596,61 +2341,12 @@
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
-				<EntityType Name="EnvironmentChain">
-					<Key>
-						<PropertyRef Name="Id" />
-					</Key>
-					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-					<Property Name="BundleVersionId" Type="Int32" Nullable="false" />
-					<Property Name="NextEnvironmentId" Type="Int32" Nullable="false" />
-					<Property Name="SourceEnvironmentId" Type="Int32" Nullable="false" />
-					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.FK_EnvironmentChain_BundleVersion" FromRole="EnvironmentChain" ToRole="BundleVersion" />
-					<NavigationProperty Name="Environment" Relationship="AspNetDeployModel.FK_EnvironmentChain_Environment_Next" FromRole="EnvironmentChain" ToRole="Environment" />
-					<NavigationProperty Name="Environment1" Relationship="AspNetDeployModel.FK_EnvironmentChain_Environment_Source" FromRole="EnvironmentChain" ToRole="Environment" />
-				</EntityType>
-				<Association Name="FK_EnvironmentChain_BundleVersion">
-					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
-					<End Type="AspNetDeployModel.EnvironmentChain" Role="EnvironmentChain" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="BundleVersion">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="EnvironmentChain">
-							<PropertyRef Name="BundleVersionId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_EnvironmentChain_Environment_Next">
-					<End Type="AspNetDeployModel.Environment" Role="Environment" Multiplicity="1" />
-					<End Type="AspNetDeployModel.EnvironmentChain" Role="EnvironmentChain" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="Environment">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="EnvironmentChain">
-							<PropertyRef Name="NextEnvironmentId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-				<Association Name="FK_EnvironmentChain_Environment_Source">
-					<End Type="AspNetDeployModel.Environment" Role="Environment" Multiplicity="1" />
-					<End Type="AspNetDeployModel.EnvironmentChain" Role="EnvironmentChain" Multiplicity="*" />
-					<ReferentialConstraint>
-						<Principal Role="Environment">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="EnvironmentChain">
-							<PropertyRef Name="SourceEnvironmentId" />
-						</Dependent>
-					</ReferentialConstraint>
-				</Association>
-
 				<EntityType Name="Revision">
 					<Key>
 						<PropertyRef Name="Id" />
 					</Key>
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-					<Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+					<Property Name="Name" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
 					<Property Name="SourceControlId" Type="Int32" Nullable="false" />
 					<Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
 					<Property Name="ParentRevisionId" Type="Int32" />
@@ -2658,6 +2354,7 @@
 					<NavigationProperty Name="ParentRevision" Relationship="AspNetDeployModel.FK_Revision_Revision" FromRole="Revision1" ToRole="Revision" />
 					<NavigationProperty Name="SourceControlVersion" Relationship="AspNetDeployModel.FK_Revision_SourceControlVersion1" FromRole="Revision" ToRole="SourceControlVersion" />
 					<NavigationProperty Name="RevisionInfos" Relationship="AspNetDeployModel.FK_RevisionInfo_Revision" FromRole="Revision" ToRole="RevisionInfo" />
+					<Property Name="Author" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
 				</EntityType>
 				<EntityType Name="RevisionInfo">
 					<Key>
@@ -2666,7 +2363,7 @@
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="RevisionId" Type="Int32" Nullable="false" />
 					<Property Name="Message" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
-					<Property Name="Author" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+					<Property Name="Author" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
 					<Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
 					<NavigationProperty Name="Revision" Relationship="AspNetDeployModel.FK_RevisionInfo_Revision" FromRole="RevisionInfo" ToRole="Revision" />
 				</EntityType>
@@ -2706,6 +2403,192 @@
 						</Dependent>
 					</ReferentialConstraint>
 				</Association>
+				<EntityType Name="BundleVersion">
+					<Key>
+						<PropertyRef Name="Id" />
+					</Key>
+					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+					<Property Name="BundleId" Type="Int32" Nullable="false" />
+					<Property Name="ParentBundleVersionId" Type="Int32" />
+					<Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+					<Property Name="OrderIndex" Type="Int32" Nullable="false" />
+					<Property Name="IsHead" Type="Boolean" Nullable="false" />
+					<Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+					<Property Name="IsArchived" Type="Boolean" Nullable="false" />
+					<NavigationProperty Name="Bundle" Relationship="AspNetDeployModel.FK_BundleVersion_Bundle" FromRole="BundleVersion" ToRole="Bundle" />
+					<NavigationProperty Name="ChildBundleVersions" Relationship="AspNetDeployModel.FK_BundleVersion_BundleVersion" FromRole="BundleVersion" ToRole="BundleVersion1" />
+					<NavigationProperty Name="ParentBundleVersion" Relationship="AspNetDeployModel.FK_BundleVersion_BundleVersion" FromRole="BundleVersion1" ToRole="BundleVersion" />
+					<NavigationProperty Name="Properties" Relationship="AspNetDeployModel.FK_BundleVersionProperty_BundleVersion" FromRole="BundleVersion" ToRole="BundleVersionProperty" />
+					<NavigationProperty Name="DeploymentSteps" Relationship="AspNetDeployModel.FK_DeploymentStep_BundleVersion" FromRole="BundleVersion" ToRole="DeploymentStep" />
+					<NavigationProperty Name="Packages" Relationship="AspNetDeployModel.FK_Package_BundleVersion" FromRole="BundleVersion" ToRole="Package" />
+					<NavigationProperty Name="ProjectVersionToBundleVersion" Relationship="AspNetDeployModel.FK_ProjectVersionToBundleVersion_BundleVersion" FromRole="BundleVersion" ToRole="ProjectVersionToBundleVersion" />
+					<NavigationProperty Name="DataFields" Relationship="AspNetDeployModel.DataFieldToBundleVersion" FromRole="BundleVersion" ToRole="DataField" />
+				</EntityType>
+				<EntityType Name="ProjectVersion">
+					<Key>
+						<PropertyRef Name="Id" />
+					</Key>
+					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+					<Property Name="ProjectId" Type="Int32" Nullable="false" />
+					<Property Name="SourceControlVersionId" Type="Int32" Nullable="false" />
+					<Property Name="Name" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+					<Property Name="ProjectType" Type="AspNetDeployModel.ProjectType" Nullable="false" />
+					<Property Name="SolutionFile" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+					<Property Name="ProjectFile" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+					<Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+					<NavigationProperty Name="PackageEntry" Relationship="AspNetDeployModel.FK_PackageEntry_ProjectVersion" FromRole="ProjectVersion" ToRole="PackageEntry" />
+					<NavigationProperty Name="Project" Relationship="AspNetDeployModel.FK_ProjectVersion_Project" FromRole="ProjectVersion" ToRole="Project" />
+					<NavigationProperty Name="SourceControlVersion" Relationship="AspNetDeployModel.FK_ProjectVersion_SourceControlVersion" FromRole="ProjectVersion" ToRole="SourceControlVersion" />
+					<NavigationProperty Name="Properties" Relationship="AspNetDeployModel.FK_ProjectVersionProperty_ProjectVersion" FromRole="ProjectVersion" ToRole="ProjectVersionProperty" />
+					<NavigationProperty Name="ProjectVersionToBundleVersion" Relationship="AspNetDeployModel.FK_ProjectVersionToBundleVersion_ProjectVersion" FromRole="ProjectVersion" ToRole="ProjectVersionToBundleVersion" />
+				</EntityType>
+				<EntityType Name="ProjectVersionToBundleVersion">
+					<Key>
+						<PropertyRef Name="Id" />
+					</Key>
+					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+					<Property Name="ProjectVersionId" Type="Int32" Nullable="false" />
+					<Property Name="BundleVersionId" Type="Int32" Nullable="false" />
+					<Property Name="PackagerId" Type="Int32" />
+					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.FK_ProjectVersionToBundleVersion_BundleVersion" FromRole="ProjectVersionToBundleVersion" ToRole="BundleVersion" />
+					<NavigationProperty Name="ProjectVersion" Relationship="AspNetDeployModel.FK_ProjectVersionToBundleVersion_ProjectVersion" FromRole="ProjectVersionToBundleVersion" ToRole="ProjectVersion" />
+				</EntityType>
+				<Association Name="FK_BundleVersion_Bundle">
+					<End Type="AspNetDeployModel.Bundle" Role="Bundle" Multiplicity="1" />
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="Bundle">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="BundleVersion">
+							<PropertyRef Name="BundleId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_BundleVersion_BundleVersion">
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="0..1" />
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion1" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="BundleVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="BundleVersion1">
+							<PropertyRef Name="ParentBundleVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_BundleVersionProperty_BundleVersion">
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.BundleVersionProperty" Role="BundleVersionProperty" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="BundleVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="BundleVersionProperty">
+							<PropertyRef Name="BundleVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_DeploymentStep_BundleVersion">
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.DeploymentStep" Role="DeploymentStep" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="BundleVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="DeploymentStep">
+							<PropertyRef Name="BundleVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_Package_BundleVersion">
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.Package" Role="Package" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="BundleVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="Package">
+							<PropertyRef Name="BundleVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_ProjectVersionToBundleVersion_BundleVersion">
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.ProjectVersionToBundleVersion" Role="ProjectVersionToBundleVersion" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="BundleVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="ProjectVersionToBundleVersion">
+							<PropertyRef Name="BundleVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_PackageEntry_ProjectVersion">
+					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.PackageEntry" Role="PackageEntry" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="ProjectVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="PackageEntry">
+							<PropertyRef Name="ProjectVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_ProjectVersion_Project">
+					<End Type="AspNetDeployModel.Project" Role="Project" Multiplicity="1" />
+					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="Project">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="ProjectVersion">
+							<PropertyRef Name="ProjectId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_ProjectVersion_SourceControlVersion">
+					<End Type="AspNetDeployModel.SourceControlVersion" Role="SourceControlVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="SourceControlVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="ProjectVersion">
+							<PropertyRef Name="SourceControlVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_ProjectVersionProperty_ProjectVersion">
+					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.ProjectVersionProperty" Role="ProjectVersionProperty" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="ProjectVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="ProjectVersionProperty">
+							<PropertyRef Name="ProjectVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="FK_ProjectVersionToBundleVersion_ProjectVersion">
+					<End Type="AspNetDeployModel.ProjectVersion" Role="ProjectVersion" Multiplicity="1" />
+					<End Type="AspNetDeployModel.ProjectVersionToBundleVersion" Role="ProjectVersionToBundleVersion" Multiplicity="*" />
+					<ReferentialConstraint>
+						<Principal Role="ProjectVersion">
+							<PropertyRef Name="Id" />
+						</Principal>
+						<Dependent Role="ProjectVersionToBundleVersion">
+							<PropertyRef Name="ProjectVersionId" />
+						</Dependent>
+					</ReferentialConstraint>
+				</Association>
+				<Association Name="DataFieldToBundleVersion">
+					<End Type="AspNetDeployModel.BundleVersion" Role="BundleVersion" Multiplicity="*" />
+					<End Type="AspNetDeployModel.DataField" Role="DataField" Multiplicity="*" />
+				</Association>
 			</Schema>
 		</edmx:ConceptualModels>
 		<!-- C-S mapping content -->
@@ -2719,20 +2602,6 @@
 								<ScalarProperty Name="IsSingleInstance" ColumnName="IsSingleInstance" />
 								<ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
 								<ScalarProperty Name="Name" ColumnName="Name" />
-								<ScalarProperty Name="Id" ColumnName="Id" />
-							</MappingFragment>
-						</EntityTypeMapping>
-					</EntitySetMapping>
-					<EntitySetMapping Name="BundleVersion">
-						<EntityTypeMapping TypeName="AspNetDeployModel.BundleVersion">
-							<MappingFragment StoreEntitySet="BundleVersion">
-								<ScalarProperty Name="IsArchived" ColumnName="IsArchived" />
-								<ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
-								<ScalarProperty Name="ParentBundleVersionId" ColumnName="ParentBundleVersionId" />
-								<ScalarProperty Name="IsHead" ColumnName="IsHead" />
-								<ScalarProperty Name="OrderIndex" ColumnName="OrderIndex" />
-								<ScalarProperty Name="Name" ColumnName="Name" />
-								<ScalarProperty Name="BundleId" ColumnName="BundleId" />
 								<ScalarProperty Name="Id" ColumnName="Id" />
 							</MappingFragment>
 						</EntityTypeMapping>
@@ -2814,20 +2683,6 @@
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
-					<EntitySetMapping Name="ProjectVersion">
-						<EntityTypeMapping TypeName="AspNetDeployModel.ProjectVersion">
-							<MappingFragment StoreEntitySet="ProjectVersion">
-								<ScalarProperty Name="Name" ColumnName="Name" />
-								<ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
-								<ScalarProperty Name="ProjectFile" ColumnName="ProjectFile" />
-								<ScalarProperty Name="SolutionFile" ColumnName="SolutionFile" />
-								<ScalarProperty Name="ProjectType" ColumnName="ProjectType" />
-								<ScalarProperty Name="SourceControlVersionId" ColumnName="SourceControlVersionId" />
-								<ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
-								<ScalarProperty Name="Id" ColumnName="Id" />
-							</MappingFragment>
-						</EntityTypeMapping>
-					</EntitySetMapping>
 					<EntitySetMapping Name="SourceControl">
 						<EntityTypeMapping TypeName="AspNetDeployModel.SourceControl">
 							<MappingFragment StoreEntitySet="SourceControl">
@@ -2902,14 +2757,6 @@
 						</EndProperty>
 						<EndProperty Name="Bundle">
 							<ScalarProperty Name="Id" ColumnName="BundleId" />
-						</EndProperty>
-					</AssociationSetMapping>
-					<AssociationSetMapping Name="ProjectVersionToBundleVersion" TypeName="AspNetDeployModel.ProjectVersionToBundleVersion" StoreEntitySet="ProjectVersionToBundleVersion">
-						<EndProperty Name="ProjectVersion">
-							<ScalarProperty Name="Id" ColumnName="ProjectVersionId" />
-						</EndProperty>
-						<EndProperty Name="BundleVersion">
-							<ScalarProperty Name="Id" ColumnName="BundleVersionId" />
 						</EndProperty>
 					</AssociationSetMapping>
 					<AssociationSetMapping Name="SourceControlToGroup" TypeName="AspNetDeployModel.SourceControlToGroup" StoreEntitySet="SourceControlToGroup">
@@ -3026,14 +2873,6 @@
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
-					<AssociationSetMapping Name="DataFieldToBundleVersion" TypeName="AspNetDeployModel.DataFieldToBundleVersion" StoreEntitySet="DataFieldToBundleVersion">
-						<EndProperty Name="DataField">
-							<ScalarProperty Name="Id" ColumnName="DataFieldId" />
-						</EndProperty>
-						<EndProperty Name="BundleVersion">
-							<ScalarProperty Name="Id" ColumnName="BundleVersionId" />
-						</EndProperty>
-					</AssociationSetMapping>
 					<EntitySetMapping Name="PackageApprovedOnEnvironment">
 						<EntityTypeMapping TypeName="AspNetDeployModel.PackageApprovedOnEnvironment">
 							<MappingFragment StoreEntitySet="PackageApprovedOnEnvironment">
@@ -3113,19 +2952,10 @@
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
-					<EntitySetMapping Name="EnvironmentChain">
-						<EntityTypeMapping TypeName="AspNetDeployModel.EnvironmentChain">
-							<MappingFragment StoreEntitySet="EnvironmentChain">
-								<ScalarProperty Name="SourceEnvironmentId" ColumnName="SourceEnvironmentId" />
-								<ScalarProperty Name="NextEnvironmentId" ColumnName="NextEnvironmentId" />
-								<ScalarProperty Name="BundleVersionId" ColumnName="BundleVersionId" />
-								<ScalarProperty Name="Id" ColumnName="Id" />
-							</MappingFragment>
-						</EntityTypeMapping>
-					</EntitySetMapping>
 					<EntitySetMapping Name="Revision">
 						<EntityTypeMapping TypeName="AspNetDeployModel.Revision">
 							<MappingFragment StoreEntitySet="Revision">
+								<ScalarProperty Name="Author" ColumnName="Author" />
 								<ScalarProperty Name="ParentRevisionId" ColumnName="ParentRevisionId" />
 								<ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
 								<ScalarProperty Name="SourceControlId" ColumnName="SourceControlId" />
@@ -3145,6 +2975,52 @@
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
+					<EntitySetMapping Name="BundleVersion">
+						<EntityTypeMapping TypeName="AspNetDeployModel.BundleVersion">
+							<MappingFragment StoreEntitySet="BundleVersion">
+								<ScalarProperty Name="IsArchived" ColumnName="IsArchived" />
+								<ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+								<ScalarProperty Name="IsHead" ColumnName="IsHead" />
+								<ScalarProperty Name="OrderIndex" ColumnName="OrderIndex" />
+								<ScalarProperty Name="Name" ColumnName="Name" />
+								<ScalarProperty Name="ParentBundleVersionId" ColumnName="ParentBundleVersionId" />
+								<ScalarProperty Name="BundleId" ColumnName="BundleId" />
+								<ScalarProperty Name="Id" ColumnName="Id" />
+							</MappingFragment>
+						</EntityTypeMapping>
+					</EntitySetMapping>
+					<EntitySetMapping Name="ProjectVersion">
+						<EntityTypeMapping TypeName="AspNetDeployModel.ProjectVersion">
+							<MappingFragment StoreEntitySet="ProjectVersion">
+								<ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+								<ScalarProperty Name="ProjectFile" ColumnName="ProjectFile" />
+								<ScalarProperty Name="SolutionFile" ColumnName="SolutionFile" />
+								<ScalarProperty Name="ProjectType" ColumnName="ProjectType" />
+								<ScalarProperty Name="Name" ColumnName="Name" />
+								<ScalarProperty Name="SourceControlVersionId" ColumnName="SourceControlVersionId" />
+								<ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
+								<ScalarProperty Name="Id" ColumnName="Id" />
+							</MappingFragment>
+						</EntityTypeMapping>
+					</EntitySetMapping>
+					<EntitySetMapping Name="ProjectVersionToBundleVersion">
+						<EntityTypeMapping TypeName="AspNetDeployModel.ProjectVersionToBundleVersion">
+							<MappingFragment StoreEntitySet="ProjectVersionToBundleVersion">
+								<ScalarProperty Name="PackagerId" ColumnName="PackagerId" />
+								<ScalarProperty Name="BundleVersionId" ColumnName="BundleVersionId" />
+								<ScalarProperty Name="ProjectVersionId" ColumnName="ProjectVersionId" />
+								<ScalarProperty Name="Id" ColumnName="Id" />
+							</MappingFragment>
+						</EntityTypeMapping>
+					</EntitySetMapping>
+					<AssociationSetMapping Name="DataFieldToBundleVersion" TypeName="AspNetDeployModel.DataFieldToBundleVersion" StoreEntitySet="DataFieldToBundleVersion">
+						<EndProperty Name="DataField">
+							<ScalarProperty Name="Id" ColumnName="DataFieldId" />
+						</EndProperty>
+						<EndProperty Name="BundleVersion">
+							<ScalarProperty Name="Id" ColumnName="BundleVersionId" />
+						</EndProperty>
+					</AssociationSetMapping>
 				</EntityContainerMapping>
 			</Mapping>
 		</edmx:Mappings>

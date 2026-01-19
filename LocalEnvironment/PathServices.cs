@@ -18,9 +18,9 @@ namespace LocalEnvironment
             return this.GetWorkingFolderPath(string.Format(@"Packages\package-{0}-{1}.zip", bundleId, packageId));
         }
 
-        public string GetProjectPackagePath(int projectId, string revisionId)
+        public string GetProjectPackagePath(int projectPackageId, string revisionId, int packagerId)
         {
-            return this.GetWorkingFolderPath(string.Format(@"Packages\project-{0}-{1}.zip", projectId, revisionId));
+            return this.GetWorkingFolderPath(string.Format(@"Packages\project-{0}-{1}-packager{2}.zip", projectPackageId, revisionId, packagerId));
         }
 
         public string GetNugetPath()

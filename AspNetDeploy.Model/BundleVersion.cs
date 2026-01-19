@@ -16,32 +16,30 @@ namespace AspNetDeploy.Model
     {
         public BundleVersion()
         {
-            this.DeploymentSteps = new HashSet<DeploymentStep>();
-            this.ProjectVersions = new HashSet<ProjectVersion>();
-            this.Packages = new HashSet<Package>();
-            this.Properties = new HashSet<BundleVersionProperty>();
-            this.DataFields = new HashSet<DataField>();
             this.ChildBundleVersions = new HashSet<BundleVersion>();
-            this.EnvironmentChain = new HashSet<EnvironmentChain>();
+            this.Properties = new HashSet<BundleVersionProperty>();
+            this.DeploymentSteps = new HashSet<DeploymentStep>();
+            this.Packages = new HashSet<Package>();
+            this.ProjectVersionToBundleVersion = new HashSet<ProjectVersionToBundleVersion>();
+            this.DataFields = new HashSet<DataField>();
         }
     
         public int Id { get; set; }
         public int BundleId { get; set; }
+        public Nullable<int> ParentBundleVersionId { get; set; }
         public string Name { get; set; }
         public int OrderIndex { get; set; }
         public bool IsHead { get; set; }
-        public Nullable<int> ParentBundleVersionId { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsArchived { get; set; }
     
         public virtual Bundle Bundle { get; set; }
-        public virtual ICollection<DeploymentStep> DeploymentSteps { get; set; }
-        public virtual ICollection<ProjectVersion> ProjectVersions { get; set; }
-        public virtual ICollection<Package> Packages { get; set; }
-        public virtual ICollection<BundleVersionProperty> Properties { get; set; }
-        public virtual ICollection<DataField> DataFields { get; set; }
         public virtual ICollection<BundleVersion> ChildBundleVersions { get; set; }
         public virtual BundleVersion ParentBundleVersion { get; set; }
-        public virtual ICollection<EnvironmentChain> EnvironmentChain { get; set; }
+        public virtual ICollection<BundleVersionProperty> Properties { get; set; }
+        public virtual ICollection<DeploymentStep> DeploymentSteps { get; set; }
+        public virtual ICollection<Package> Packages { get; set; }
+        public virtual ICollection<ProjectVersionToBundleVersion> ProjectVersionToBundleVersion { get; set; }
+        public virtual ICollection<DataField> DataFields { get; set; }
     }
 }

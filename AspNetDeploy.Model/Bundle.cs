@@ -16,8 +16,8 @@ namespace AspNetDeploy.Model
     {
         public Bundle()
         {
-            this.BundleVersions = new HashSet<BundleVersion>();
             this.Projects = new HashSet<Project>();
+            this.BundleVersions = new HashSet<BundleVersion>();
         }
     
         public int Id { get; set; }
@@ -26,7 +26,7 @@ namespace AspNetDeploy.Model
         public bool IsSingleInstance { get; set; }
         public int OrderIndex { get; set; }
     
-        public virtual ICollection<BundleVersion> BundleVersions { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
+        public virtual ICollection<BundleVersion> BundleVersions { get; set; }
     }
 }

@@ -16,8 +16,8 @@ namespace AspNetDeploy.Model
     {
         public DataField()
         {
-            this.BundleVersions = new HashSet<BundleVersion>();
             this.DataFieldValues = new HashSet<DataFieldValue>();
+            this.BundleVersion = new HashSet<BundleVersion>();
         }
     
         public int Id { get; set; }
@@ -27,7 +27,7 @@ namespace AspNetDeploy.Model
         public DataFieldMode Mode { get; set; }
         public bool IsDeleted { get; set; }
     
-        public virtual ICollection<BundleVersion> BundleVersions { get; set; }
         public virtual ICollection<DataFieldValue> DataFieldValues { get; set; }
+        public virtual ICollection<BundleVersion> BundleVersion { get; set; }
     }
 }

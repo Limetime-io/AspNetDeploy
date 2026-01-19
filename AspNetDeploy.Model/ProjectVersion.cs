@@ -16,24 +16,24 @@ namespace AspNetDeploy.Model
     {
         public ProjectVersion()
         {
-            this.BundleVersions = new HashSet<BundleVersion>();
+            this.PackageEntry = new HashSet<PackageEntry>();
             this.Properties = new HashSet<ProjectVersionProperty>();
-            this.PackageEntries = new HashSet<PackageEntry>();
+            this.ProjectVersionToBundleVersion = new HashSet<ProjectVersionToBundleVersion>();
         }
     
         public int Id { get; set; }
         public int ProjectId { get; set; }
         public int SourceControlVersionId { get; set; }
+        public string Name { get; set; }
         public ProjectType ProjectType { get; set; }
         public string SolutionFile { get; set; }
         public string ProjectFile { get; set; }
         public bool IsDeleted { get; set; }
-        public string Name { get; set; }
     
+        public virtual ICollection<PackageEntry> PackageEntry { get; set; }
         public virtual Project Project { get; set; }
         public virtual SourceControlVersion SourceControlVersion { get; set; }
-        public virtual ICollection<BundleVersion> BundleVersions { get; set; }
         public virtual ICollection<ProjectVersionProperty> Properties { get; set; }
-        public virtual ICollection<PackageEntry> PackageEntries { get; set; }
+        public virtual ICollection<ProjectVersionToBundleVersion> ProjectVersionToBundleVersion { get; set; }
     }
 }

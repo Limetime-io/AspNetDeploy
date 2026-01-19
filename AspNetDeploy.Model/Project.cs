@@ -17,8 +17,8 @@ namespace AspNetDeploy.Model
         public Project()
         {
             this.Properties = new HashSet<ProjectProperty>();
-            this.ProjectVersions = new HashSet<ProjectVersion>();
             this.Bundles = new HashSet<Bundle>();
+            this.ProjectVersions = new HashSet<ProjectVersion>();
         }
     
         public int Id { get; set; }
@@ -28,7 +28,7 @@ namespace AspNetDeploy.Model
     
         public virtual SourceControl SourceControl { get; set; }
         public virtual ICollection<ProjectProperty> Properties { get; set; }
-        public virtual ICollection<ProjectVersion> ProjectVersions { get; set; }
         public virtual ICollection<Bundle> Bundles { get; set; }
+        public virtual ICollection<ProjectVersion> ProjectVersions { get; set; }
     }
 }
