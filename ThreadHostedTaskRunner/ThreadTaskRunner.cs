@@ -343,7 +343,7 @@ namespace ThreadHostedTaskRunner
             List<SourceControlVersion> sourceControlVersions = entities.SourceControlVersion
                 .Include("ProjectVersions")
                 .Include("Properties")
-                .Include("ProjectVersions.BundleVersions")
+                .Include("ProjectVersions.ProjectVersionToBundleVersion.BundleVersion")
                 .Include("SourceControl.Properties")
                 .Where(scv => scv.ArchiveState == SourceControlVersionArchiveState.Archiving)
                 .ToList();
@@ -376,7 +376,7 @@ namespace ThreadHostedTaskRunner
             List<SourceControlVersion> sourceControlVersions = entities.SourceControlVersion
                 .Include("ProjectVersions")
                 .Include("Properties")
-                .Include("ProjectVersions.ProjectVersionTobundleVersion.BundleVersion")
+                .Include("ProjectVersions.ProjectVersionToBundleVersion.BundleVersion")
                 .Include("SourceControl.Properties")
                 .Where( scv => scv.ArchiveState == SourceControlVersionArchiveState.Normal)
                 .ToList();
