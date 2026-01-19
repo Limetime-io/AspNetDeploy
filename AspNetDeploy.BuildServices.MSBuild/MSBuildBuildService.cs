@@ -64,18 +64,27 @@ namespace AspNetDeploy.BuildServices.MSBuild
 
         private static int DoMSBuild(string toolPath, string targetFile, out string output)
         {
-            Process process = new Process();
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.WorkingDirectory = Path.GetDirectoryName(targetFile);
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.FileName = toolPath;
-            process.StartInfo.Arguments = string.Format("\"{0}\" /t:Restore;Clean;Rebuild -p:Configuration=Release", targetFile);
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.WorkingDirectory = Path.GetDirectoryName(targetFile);
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.FileName = toolPath;
+                process.StartInfo.Arguments = string.Format("\"{0}\" /t:Restore;Clean;Rebuild -p:Configuration=Release", targetFile);
 
-            process.Start();
-            output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
+                process.Start();
+                output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
 
-            return process.ExitCode;
+                return process.ExitCode;
+            }
+            catch (Exception e)
+            {
+                e.Data.Add("ToolPath", toolPath);
+                e.Data.Add("targetFile", targetFile);
+                throw e;
+            }
         }
 
         private string LatestToolsVersion()

@@ -19,7 +19,7 @@ namespace ThreadHostedTaskRunner
 
         public void Initialize()
         {
-            Timer.Change(new TimeSpan(0, 0, 30), new TimeSpan(0, 0, 10));
+            Timer.Change(new TimeSpan(0, 0, 30), new TimeSpan(0, 0, 30));
         }
 
         public void WatchForSources()
@@ -267,6 +267,7 @@ namespace ThreadHostedTaskRunner
             foreach (BundleVersion bundleVersion in bundleVersions)
             {
                 List<ProjectVersion> projectVersions = bundleVersion.ProjectVersionToBundleVersion.Where(pv =>
+                    pv.ProjectVersion.SourceControlVersion.ArchiveState == SourceControlVersionArchiveState.Normal &&
                     (
                         pv.ProjectVersion.ProjectType.HasFlag(ProjectType.Database) ||
                         pv.ProjectVersion.ProjectType.HasFlag(ProjectType.WindowsApplication) ||
@@ -286,7 +287,9 @@ namespace ThreadHostedTaskRunner
                     TaskRunnerContext.SetProjectVersionState(projectVersion.Id, ProjectState.Error);
                 }
 
-                List<ProjectVersion> projectVersionsToRebuild = projectVersions.Where(pv => pv.SourceControlVersion.GetStringProperty("Revision") != pv.GetStringProperty("LastBuildRevision")).ToList();
+                List<ProjectVersion> projectVersionsToRebuild = projectVersions
+                    .Where(pv => pv.SourceControlVersion.GetStringProperty("Revision") != pv.GetStringProperty("LastBuildRevision"))
+                    .ToList();
 
                 if (projectVersionsToRebuild.Count == 0)
                 {

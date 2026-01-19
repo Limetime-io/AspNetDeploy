@@ -116,7 +116,7 @@ namespace AspNetDeploy.WebUI.Controllers
             BundleVersion bundleVersion = this.Entities.BundleVersion
                 .Include("Bundle")
                 .Include("Properties")
-                .Include("ProjectVersions.SourceControlVersion.SourceControl")
+                .Include("ProjectVersionTobundleVersion.ProjectVersion.SourceControlVersion.SourceControl")
                 .First(bv => bv.Id == id );
 
             this.ViewBag.BundleVersion = bundleVersion;
@@ -312,7 +312,7 @@ namespace AspNetDeploy.WebUI.Controllers
         {
             Bundle bundle = this.Entities.Bundle
                 .Include("BundleVersions.Properties")
-                .Include("BundleVersions.ProjectVersions.SourceControlVersion.SourceControl")
+                .Include("BundleVersions.ProjectVersionTobundleVersion.ProjectVersion.SourceControlVersion.SourceControl")
                 .First( b => b.Id == id);
 
             List<object> tree = bundle.BundleVersions.Where(bv => bv.ParentBundleVersion == null).Select(TreeSelector).ToList();

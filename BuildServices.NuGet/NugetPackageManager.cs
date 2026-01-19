@@ -17,28 +17,36 @@ namespace BuildServices.NuGet
 
         public void RestoreSolutionPackages(string solutionFile)
         {
-            Process process = new Process();
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.WorkingDirectory = Path.GetDirectoryName(solutionFile);
-
-            process.StartInfo.FileName = this.pathServices.GetNugetPath();
-            process.StartInfo.Arguments = string.Format(
-                "restore \"{0}\"",
-                solutionFile);
-
-            process.Start();
-
-            string output = process.StandardOutput.ReadToEnd();
-
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
+            try
             {
-                NugetException exception = new NugetException("Nuget returned: " + process.ExitCode);
-                exception.Data.Add("Output", output);
+                Process process = new Process();
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.WorkingDirectory = Path.GetDirectoryName(solutionFile);
 
-                throw exception;
+                process.StartInfo.FileName = this.pathServices.GetNugetPath();
+                process.StartInfo.Arguments = string.Format(
+                    "restore \"{0}\"",
+                    solutionFile);
+
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    NugetException exception = new NugetException("Nuget returned: " + process.ExitCode);
+                    exception.Data.Add("Output", output);
+
+                    throw exception;
+                }
+            }
+            catch (Exception ex) 
+            {
+                ex.Data.Add("SolutionFile", solutionFile);
+                throw ex;
             }
         }
 
