@@ -185,3 +185,4 @@ FakesAssemblies/
 .vs/
 /WebUI/Connections.config
 /AspNetDeploy.Model/App.Config
+/ConsoleTest/Connections.config
