@@ -70,6 +70,15 @@ namespace AspNetDeploy.SolutionParsers.VisualStudio
             string sdkValue = xDocument.Descendants("Project").Attributes("Sdk").Select(a => a.Value).FirstOrDefault();
             visualStudioProject.Type = VsProjectType.NetCore;
 
+            string targetFramework = xDocument.Descendants("TargetFramework").Select(n => n.Value).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(targetFramework))
+            {
+                targetFramework = xDocument.Descendants("TargetFrameworks").Select(n => n.Value).FirstOrDefault();
+            }
+
+            visualStudioProject.TargetFrameworkVersion = targetFramework;
+
             if (sdkValue == "Microsoft.NET.Sdk.Web")
             {
                 visualStudioProject.Type |= VsProjectType.Web;

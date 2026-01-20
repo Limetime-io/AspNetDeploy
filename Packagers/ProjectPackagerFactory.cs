@@ -54,34 +54,19 @@ namespace Packagers
             throw new AspNetDeployException("Project type is not supported: " + projectType);
         }
 
-        public IProjectPackager Create(PackagerType projectType)
+        public IProjectPackager Create(ProjectBundleConfig config)
         {
-            switch (projectType)
+            if (config is NetCoreProjectBundleConfig netCoreProjectBundleConfig)
             {
-                case PackagerType.Zip:
-                    return new ZipProjectPackager();
+                if (netCoreProjectBundleConfig.OutputType == NetCoreOutputType.DockerContainer)
+                {
+                    return new DotNetDockerProjectPackager(netCoreProjectBundleConfig);
+                }
 
-                case PackagerType.Database:
-                    return new DatabaseProjectPackager();
-
-                case PackagerType.Gulp:
-                    return new GulpProjectPackager();
-
-                case PackagerType.Directory:
-                    return new DirectoryProjectPackager();
-
-                case PackagerType.IisWebSite:
-                    return new WebProjectPackager();
-
-                case PackagerType.DotnetCore:
-                    return new DotNetCoreProjectPackager();
-
-                case PackagerType.Docker:
-                    return new DotNetDockerProjectPackager();
+                return new DotNetCoreProjectPackager(netCoreProjectBundleConfig);
             }
 
-            throw new AspNetDeployException("Project type is not supported");
+            throw new AspNetDeployException("Not supported config type: " + config.GetType().FullName);
         }
-
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AspNetDeploy.BuildServices.DotnetCore;
 using AspNetDeploy.BuildServices.MSBuild;
 using AspNetDeploy.Contracts;
+using AspNetDeploy.Contracts.Exceptions;
 using AspNetDeploy.Model;
 using BuildServices.Gulp;
 
@@ -28,6 +29,21 @@ namespace AspNetDeploy.BuildServices
             }
 
             return new MSBuildBuildService(this.pathServices);
+        }
+
+        public IBuildService Create(ProjectBundleConfig config)
+        {
+            if (config is NetCoreProjectBundleConfig netCoreProjectBundle)
+            {
+                if (netCoreProjectBundle.OutputType == NetCoreOutputType.DockerContainer)
+                {
+                    return new DotnetCoreDockerBuildService();
+                }
+
+                return new DotnetCoreBuildService();
+            }
+
+            throw new AspNetDeployException("Project bundle config is not supported");
         }
     }
 }

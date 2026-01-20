@@ -224,6 +224,19 @@ namespace AspNetDeploy.WebUI.Controllers
 
             if (deploymentStepType == DeploymentStepType.DeployContainer)
             {
+                this.ViewBag.ProjectsSelect = this.Entities.SourceControlVersion
+                    .SelectMany(scv => scv.ProjectVersions)
+                    .Where(pv => pv.ProjectType.HasFlag(ProjectType.Web) && pv.ProjectType.HasFlag(ProjectType.NetCore))
+                    .Where(pv => !pv.Project.Properties.Any(p => p.Key == "NotForDeployment" && p.Value == "true"))
+                    //.Where(pv => pv.Properties.Any(p => p.Key == "TargetFrameworkVersion" && (p.Value.Contains("net8.0") || p.Value.Contains("net9.0") || p.Value.Contains("net10.0"))))
+                    .Select(pv => new SelectListItem
+                    {
+                        Text = pv.SourceControlVersion.SourceControl.Name + " / " + pv.SourceControlVersion.Name + " / " + pv.Name,
+                        Value = pv.Id.ToString()
+                    })
+                    .OrderBy(sli => sli.Text)
+                    .ToList();
+
                 ContainerDeploymentStepModel model = new ContainerDeploymentStepModel
                 {
                     BundleVersionId = bundleVersion.Id
@@ -449,6 +462,7 @@ namespace AspNetDeploy.WebUI.Controllers
                     DeploymentStepId = deploymentStepId,
                     Roles = string.Join(", ", deploymentStep.MachineRoles.Select(mr => mr.Name)),
                     StepTitle = deploymentStep.GetStringProperty("Step.Title"),
+                    ProjectId = deploymentStep.GetIntProperty("ProjectId"),
                     ContainerName = deploymentStep.GetStringProperty("Container.Name"),
                     Ports = deploymentStep.GetStringProperty("Container.Ports"),
                     EnvironmentVariables = deploymentStep.GetStringProperty("Container.EnvironmentVariables"),
@@ -457,6 +471,20 @@ namespace AspNetDeploy.WebUI.Controllers
                     RestartPolicy = deploymentStep.GetStringProperty("Container.RestartPolicy"),
                     Networks = deploymentStep.GetStringProperty("Container.Networks")
                 };
+
+                this.ViewBag.ProjectsSelect = this.Entities.SourceControlVersion
+                    .SelectMany(scv => scv.ProjectVersions)
+                    .Where(pv => pv.ProjectType.HasFlag(ProjectType.Web) && pv.ProjectType.HasFlag(ProjectType.NetCore))
+                    .Where(pv => !pv.Project.Properties.Any(p => p.Key == "NotForDeployment" && p.Value == "true"))
+                    .Where(pv => pv.Properties.Any(p => p.Key == "TargetFrameworkVersion" &&
+                        (p.Value.Contains("net8.0") || p.Value.Contains("net9.0") || p.Value.Contains("net10.0"))))
+                    .Select(pv => new SelectListItem
+                    {
+                        Text = pv.SourceControlVersion.SourceControl.Name + " / " + pv.SourceControlVersion.Name + " / " + pv.Name,
+                        Value = pv.Id.ToString()
+                    })
+                    .OrderBy(sli => sli.Text)
+                    .ToList();
 
                 return this.View("EditContainerStep", model);
             }
@@ -692,6 +720,7 @@ namespace AspNetDeploy.WebUI.Controllers
             deploymentStep.SetStringProperty("Container.Volumes", model.Volumes);
             deploymentStep.SetStringProperty("Container.RestartPolicy", model.RestartPolicy);
             deploymentStep.SetStringProperty("Container.Networks", model.Networks);
+            deploymentStep.SetStringProperty("ProjectId", model.ProjectId.ToString(CultureInfo.InvariantCulture));
 
             this.UpdateProjectReference(model);
             this.SaveRoles(model, deploymentStep);
@@ -717,6 +746,8 @@ namespace AspNetDeploy.WebUI.Controllers
                     case DeploymentStepType.DeployDacpac:
                     case DeploymentStepType.CopyFiles:
                     case DeploymentStepType.DeploySourceFiles:
+                    case DeploymentStepType.RunVsTests:
+                    case DeploymentStepType.DeployContainer:
                         this.UpdateProjectReference(new ProjectRelatedDeploymentStepModel
                         {
                             BundleVersionId = deploymentStep.BundleVersionId,

@@ -75,6 +75,11 @@ namespace ConsoleTest
 
         static void Main(string[] args)
         {
+            ThreadTaskRunner threadTaskRunner = new ThreadTaskRunner();
+            ThreadTaskRunner.ProcessTasks();
+
+
+
             var variableProcessor = new VariableProcessor(null, null, null);
             WCFSatelliteDeploymentAgent agent = new WCFSatelliteDeploymentAgent(variableProcessor, "https://machine84.limetime.io:8090/AspNetDeploySatellite", "pl9uJLX94jieM32SID5b8axMJE2LpD04", "L2l3lp5LnXfIRcaaduABlOeF45iPtTod");
 

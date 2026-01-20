@@ -24,43 +24,55 @@ namespace AspNetDeploy.ContinuousIntegration
         {
             AspNetDeployEntities entities = new AspNetDeployEntities();
 
-            SourceControlVersion sourceControlVersion = entities.SourceControlVersion.Include("SourceControl").First( scv => scv.Id == sourceControlVersionId);
-            ProjectVersion projectVersion = entities.ProjectVersion.Include("Properties").First( pv => pv.Id == projectVersionId);
+            SourceControlVersion sourceControlVersion = entities.SourceControlVersion.Include("SourceControl").First(scv => scv.Id == sourceControlVersionId);
+            ProjectVersion projectVersion = entities.ProjectVersion
+                .Include("Properties")
+                .Include("ProjectVersionToBundleVersion")
+                .First(pv => pv.Id == projectVersionId);
 
-            string sourcesFolder = this.pathServices.GetSourceControlVersionPath(sourceControlVersion.SourceControl.Id, sourceControlVersion.Id);
-            IBuildService buildService = buildServiceFactory.Create(projectVersion.ProjectType);
+            foreach (ProjectVersionToBundleVersion projectVersionLink in projectVersion.ProjectVersionToBundleVersion)
+            {
+                ProjectBundleConfig config = ProjectBundleConfigFactory.Create(projectVersionLink.ConfigurationJson);
 
-            BuildSolutionResult buildSolutionResult = buildService.Build(
-                sourcesFolder,
-                projectVersion,
-                projectFileName =>
-                {
-                    ProjectVersion projectVersionBuild = entities.ProjectVersion
-                        .Where(p => p.SourceControlVersionId == sourceControlVersionId)
-                        .ToList()
-                        .FirstOrDefault(p => !p.IsDeleted && Path.Combine(sourcesFolder, p.ProjectFile).ToLowerInvariant() == projectFileName.ToLowerInvariant());
+                IBuildService buildService = config == null 
+                    ? buildServiceFactory.Create(projectVersion.ProjectType)
+                    : buildServiceFactory.Create(config);
 
-                    if (projectVersionBuild != null)
+                string sourcesFolder = this.pathServices.GetSourceControlVersionPath(sourceControlVersion.SourceControl.Id, sourceControlVersion.Id);
+                
+                BuildSolutionResult buildSolutionResult = buildService.Build(
+                    sourcesFolder,
+                    projectVersion,
+                    projectFileName =>
                     {
-                        projectBuildStarted(projectVersionBuild.Id);
-                    }
-                },
-                (projectFileName, success, message) =>
-                {
-                    ProjectVersion projectVersionBuild = entities.ProjectVersion
-                        .Where(p => p.SourceControlVersionId == sourceControlVersionId)
-                        .ToList()
-                        .FirstOrDefault(p => !p.IsDeleted && Path.Combine(sourcesFolder, p.ProjectFile).ToLowerInvariant() == projectFileName.ToLowerInvariant());
+                        ProjectVersion projectVersionBuild = entities.ProjectVersion
+                            .Where(p => p.SourceControlVersionId == sourceControlVersionId)
+                            .ToList()
+                            .FirstOrDefault(p => !p.IsDeleted && Path.Combine(sourcesFolder, p.ProjectFile).ToLowerInvariant() == projectFileName.ToLowerInvariant());
 
-                    if (projectVersionBuild != null)
+                        if (projectVersionBuild != null)
+                        {
+                            projectBuildStarted(projectVersionBuild.Id);
+                        }
+                    },
+                    (projectFileName, success, message) =>
                     {
-                        projectBuildComplete(projectVersionBuild.Id, success);
-                    }
-                },
-                (projectFile, exception) =>
-                {
-                    this.loggingService.Log(new AspNetDeployException("Project build failed: " + projectFile, exception), null);
-                });
+                        ProjectVersion projectVersionBuild = entities.ProjectVersion
+                            .Where(p => p.SourceControlVersionId == sourceControlVersionId)
+                            .ToList()
+                            .FirstOrDefault(p => !p.IsDeleted && Path.Combine(sourcesFolder, p.ProjectFile).ToLowerInvariant() == projectFileName.ToLowerInvariant());
+
+                        if (projectVersionBuild != null)
+                        {
+                            projectBuildComplete(projectVersionBuild.Id, success);
+                        }
+                    },
+                    (projectFile, exception) =>
+                    {
+                        this.loggingService.Log(new AspNetDeployException("Project build failed: " + projectFile, exception), null);
+                    });
+            }
+
         }
     }
 }

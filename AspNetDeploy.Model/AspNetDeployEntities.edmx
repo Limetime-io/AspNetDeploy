@@ -303,6 +303,7 @@
 					<Property Name="ProjectVersionId" Type="int" Nullable="false" />
 					<Property Name="BundleVersionId" Type="int" Nullable="false" />
 					<Property Name="PackagerId" Type="int" />
+					<Property Name="ConfigurationJson" Type="nvarchar" MaxLength="4000" />
 				</EntityType>
 				<EntityType Name="Publication">
 					<Key>
@@ -2450,6 +2451,7 @@
 					<Property Name="ProjectVersionId" Type="Int32" Nullable="false" />
 					<Property Name="BundleVersionId" Type="Int32" Nullable="false" />
 					<Property Name="PackagerId" Type="Int32" />
+					<Property Name="ConfigurationJson" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
 					<NavigationProperty Name="BundleVersion" Relationship="AspNetDeployModel.FK_ProjectVersionToBundleVersion_BundleVersion" FromRole="ProjectVersionToBundleVersion" ToRole="BundleVersion" />
 					<NavigationProperty Name="ProjectVersion" Relationship="AspNetDeployModel.FK_ProjectVersionToBundleVersion_ProjectVersion" FromRole="ProjectVersionToBundleVersion" ToRole="ProjectVersion" />
 				</EntityType>
@@ -3006,6 +3008,7 @@
 					<EntitySetMapping Name="ProjectVersionToBundleVersion">
 						<EntityTypeMapping TypeName="AspNetDeployModel.ProjectVersionToBundleVersion">
 							<MappingFragment StoreEntitySet="ProjectVersionToBundleVersion">
+								<ScalarProperty Name="ConfigurationJson" ColumnName="ConfigurationJson" />
 								<ScalarProperty Name="PackagerId" ColumnName="PackagerId" />
 								<ScalarProperty Name="BundleVersionId" ColumnName="BundleVersionId" />
 								<ScalarProperty Name="ProjectVersionId" ColumnName="ProjectVersionId" />

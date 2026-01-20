@@ -2,12 +2,25 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using AspNetDeploy.Model;
 using Ionic.Zip;
 
 namespace Packagers.VisualStudioProject
 {
     public class DotNetCoreProjectPackager : VisualStudioProjectPackager
     {
+        public NetCoreProjectBundleConfig NetCoreProjectBundleConfig { get; }
+
+        public DotNetCoreProjectPackager()
+        {
+            NetCoreProjectBundleConfig = new NetCoreProjectBundleConfig();
+        }
+
+        public DotNetCoreProjectPackager(NetCoreProjectBundleConfig netCoreProjectBundleConfig)
+        {
+            NetCoreProjectBundleConfig = netCoreProjectBundleConfig;
+        }
+
         protected override void PackageProjectContents(ZipFile zipFile, XDocument xDocument, XNamespace vsNamespace, string projectRootFolder)
         {
             XElement targetFramework = xDocument.Descendants("TargetFramework").FirstOrDefault();

@@ -62,6 +62,8 @@
   <ItemGroup>
     <Compile Include="DotnetCoreBuildService.cs" />
     <Compile Include="DotnetCoreBuildServiceException.cs" />
+    <Compile Include="DotnetCoreDockerBuildService.cs" />
+    <Compile Include="DotnetCoreDockerBuildServiceException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

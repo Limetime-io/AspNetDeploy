@@ -18,7 +18,8 @@ namespace AspNetDeploy.Model
         public int ProjectVersionId { get; set; }
         public int BundleVersionId { get; set; }
         public Nullable<int> PackagerId { get; set; }
-    
+        public string ConfigurationJson { get; set; }
+
         public virtual BundleVersion BundleVersion { get; set; }
         public virtual ProjectVersion ProjectVersion { get; set; }
     }

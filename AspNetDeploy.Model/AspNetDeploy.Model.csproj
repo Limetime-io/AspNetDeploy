@@ -213,6 +213,10 @@
     <Compile Include="ProjectVersionToBundleVersion.cs">
       <DependentUpon>AspNetDeployEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="ProjectBundleConfigType.cs" />
+    <Compile Include="ProjectBundleConfig.cs" />
+    <Compile Include="NetCoreProjectBundleConfig.cs" />
+    <Compile Include="ProjectBundleConfigFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Publication.cs">
       <DependentUpon>AspNetDeployEntities.tt</DependentUpon>

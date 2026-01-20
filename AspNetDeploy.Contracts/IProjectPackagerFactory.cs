@@ -18,6 +18,6 @@ namespace AspNetDeploy.Contracts
     public interface IProjectPackagerFactory
     {
         IProjectPackager Create(ProjectType projectType);
-        IProjectPackager Create(PackagerType projectType);
+        IProjectPackager Create(ProjectBundleConfig config);
     }
 }

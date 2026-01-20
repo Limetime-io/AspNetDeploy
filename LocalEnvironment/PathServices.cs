@@ -1,8 +1,8 @@
 ﻿using System.Configuration;
 using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
 using AspNetDeploy.Contracts;
 using AspNetDeploy.Contracts.Exceptions;
+using AspNetDeploy.Model;
 
 namespace LocalEnvironment
 {
@@ -18,9 +18,18 @@ namespace LocalEnvironment
             return this.GetWorkingFolderPath(string.Format(@"Packages\package-{0}-{1}.zip", bundleId, packageId));
         }
 
-        public string GetProjectPackagePath(int projectPackageId, string revisionId, int packagerId)
+        public string GetProjectPackagePath(int projectPackageId, string revisionId, ProjectBundleConfig config)
         {
-            return this.GetWorkingFolderPath(string.Format(@"Packages\project-{0}-{1}-packager{2}.zip", projectPackageId, revisionId, packagerId));
+            string labels = "";
+
+            if (config is NetCoreProjectBundleConfig projectBundleConfig)
+            {
+                labels += "-" + projectBundleConfig.Platform;
+                labels += "-" + projectBundleConfig.Architecture;
+                labels += "-" + projectBundleConfig.OutputType;
+            }
+
+            return this.GetWorkingFolderPath(string.Format(@"Packages\project-{0}-{1}{2}.zip", projectPackageId, revisionId, labels));
         }
 
         public string GetNugetPath()

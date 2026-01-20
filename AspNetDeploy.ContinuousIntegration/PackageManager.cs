@@ -53,13 +53,11 @@ namespace AspNetDeploy.ContinuousIntegration
                 {
                     ProjectVersion projectVersion = projectVersionLink.ProjectVersion;
 
-                    string sourcesFolder = this.pathServices.GetSourceControlVersionPath(projectVersion.SourceControlVersion.SourceControl.Id, projectVersion.SourceControlVersion.Id);
-                    string projectPackagePath = this.pathServices.GetProjectPackagePath(projectVersionLink.ProjectVersionId, projectVersion.SourceControlVersion.GetStringProperty("Revision"), projectVersionLink.PackagerId ?? 0);
-                    string projectPath = Path.Combine(sourcesFolder, projectVersion.ProjectFile);
+                    ProjectBundleConfig config = ProjectBundleConfigFactory.Create(projectVersionLink.ConfigurationJson);
 
-                    IProjectPackager projectPackager = projectVersionLink.PackagerId == null
+                    IProjectPackager projectPackager = config == null
                         ? projectPackagerFactory.Create(projectVersion.ProjectType)
-                        : projectPackagerFactory.Create((PackagerType)projectVersionLink.PackagerId.Value);
+                        : projectPackagerFactory.Create(config);
 
                     if (projectPackager == null) // no need to package
                     {
@@ -67,6 +65,10 @@ namespace AspNetDeploy.ContinuousIntegration
                         entities.SaveChanges();
                         continue;
                     }
+
+                    string sourcesFolder = this.pathServices.GetSourceControlVersionPath(projectVersion.SourceControlVersion.SourceControl.Id, projectVersion.SourceControlVersion.Id);
+                    string projectPackagePath = this.pathServices.GetProjectPackagePath(projectVersionLink.ProjectVersionId, projectVersion.SourceControlVersion.GetStringProperty("Revision"), config);
+                    string projectPath = Path.Combine(sourcesFolder, projectVersion.ProjectFile);
 
                     if (!File.Exists(projectPackagePath))
                     {

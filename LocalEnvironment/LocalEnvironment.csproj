@@ -74,6 +74,10 @@
       <Project>{76580B91-2151-48A4-941F-1AEF298B13DE}</Project>
       <Name>AspNetDeploy.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AspNetDeploy.Model\AspNetDeploy.Model.csproj">
+      <Project>{b22a302a-153f-4b7b-91ef-877412d3efbb}</Project>
+      <Name>AspNetDeploy.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="InitialEnvironmentResources.resx">

@@ -93,6 +93,11 @@ namespace AspNetDeploy.Projects.VisualStudio2013
             projectVersion.ProjectType = projectType;
 
             projectVersion.SolutionFile = Path.GetFileName(vsProject.SolutionFile);
+
+            if (!string.IsNullOrEmpty(vsProject.Project.TargetFrameworkVersion))
+            {
+                projectVersion.SetStringProperty("TargetFrameworkVersion", vsProject.Project.TargetFrameworkVersion);
+            }
         }
 
         public void LoadProjects()
@@ -111,7 +116,7 @@ namespace AspNetDeploy.Projects.VisualStudio2013
                     this.parsedProjects.Add(new VsProject()
                     {
                         Project = solutionProject,
-                        SolutionFile = solutionFile
+                        SolutionFile = solutionFile,
                     });
                 }
             }
