@@ -34,6 +34,14 @@ service Deployment {
   rpc GetLastException(google.protobuf.Empty) returns (GetLastExceptionResponse);
 }
 
+service Information {
+  rpc GetVersion (google.protobuf.Empty) returns (InformationVersionResponse);
+}
+
+service Monitoring {
+  rpc GetServerSummary (google.protobuf.Empty) returns (ServerSummaryResponse);
+}
+
 message IsReadyResponse{
 	bool isReady = 1;
 }
@@ -96,4 +104,30 @@ message GetLastExceptionResponse{
 	string stackTrace = 5;
 	repeated ExceptionDataInfo exceptionData= 6;
 	GetLastExceptionResponse innerException = 7;
+}
+
+message InformationVersionResponse{
+	int32 version = 1;
+}
+
+message DriveInfoResponse{
+	string name = 1;
+	string label = 2;
+	double totalSpaceMb = 3;
+	double freeSpaceMb = 4;
+}
+
+message ServerUpdateInfoResponse{
+	string title = 1;
+	string description = 2;
+	string releaseDate = 3;
+	bool isMandatory = 4;
+	bool isDownloaded = 5;
+}
+
+message ServerSummaryResponse{
+	repeated DriveInfoResponse drives = 1;
+	repeated ServerUpdateInfoResponse updates = 2;
+	double availableMemoryMb = 3;
+	double totalMemoryMb = 4;
 }

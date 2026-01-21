@@ -11,6 +11,8 @@ Satellite deployment service для Linux на базе .NET 9 и gRPC.
 - **RunPowerShellScript** - выполнение PowerShell скриптов
 - **CopyFiles** - копирование файлов
 - **RunSQLScript** - выполнение SQL скриптов
+- **InformationService.GetVersion** - версия сервиса
+- **MonitoringService.GetServerSummary** - сводка по памяти и дискам
 
 ## Требования
 
@@ -68,6 +70,8 @@ Protobuf определения находятся в `Protos/deployment.proto`.
 - `RunSQLScripts(request)` - выполнение SQL
 - `Complete()` - завершение публикации
 - `Rollback()` - откат изменений
+- `GetVersion()` - получение версии сервиса
+- `GetServerSummary()` - сводка по памяти и дискам
 
 ## Разработка
 
@@ -86,7 +90,13 @@ SatelliteLinuxGrpcHost/
 ├── Services/
 │   ├── IDeploymentService.cs  # Интерфейс сервиса
 │   ├── DeploymentService.cs   # Реализация логики
-│   └── DeploymentController.cs # gRPC контроллер
+│   ├── DeploymentController.cs # gRPC контроллер
+│   ├── IInformationService.cs # Интерфейс InformationService
+│   ├── InformationService.cs  # Реализация InformationService
+│   ├── InformationController.cs # gRPC контроллер
+│   ├── IMonitoringService.cs  # Интерфейс MonitoringService
+│   ├── MonitoringService.cs   # Реализация MonitoringService
+│   └── MonitoringController.cs # gRPC контроллер
 ├── Program.cs                 # Точка входа
 ├── appsettings.json          # Конфигурация
 └── Dockerfile                # Docker образ
