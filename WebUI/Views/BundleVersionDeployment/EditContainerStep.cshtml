@@ -7,6 +7,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     BundleVersion bundleVersion = this.ViewBag.BundleVersion;
     IEnumerable<SelectListItem> projectsSelect = this.ViewBag.ProjectsSelect;
+    IEnumerable<SelectListItem> netCorePlatforms = this.ViewBag.NetCorePlatforms;
+    IEnumerable<SelectListItem> netCoreArchitectures = this.ViewBag.NetCoreArchitectures;
     IEnumerable<MachineRole> machineRoles = this.ViewBag.MachineRoles;
 }
 
@@ -68,6 +70,22 @@
                     <div class="col-sm-10">
                         @Html.DropDownListFor(m => m.ProjectId, projectsSelect, "Choose project", new { Class = "form-control" })
                         @Html.ValidationMessageFor(m => m.ProjectId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Platform</label>
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(m => m.Platform, netCorePlatforms, new { Class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Platform)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="UserName" class="col-sm-2 control-label">Architecture</label>
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(m => m.Architecture, netCoreArchitectures, new { Class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Architecture)
                     </div>
                 </div>
 
