@@ -31,6 +31,8 @@ service Deployment {
 
   rpc ApplyDacPac(ApplyDacPacRequest) returns (google.protobuf.Empty);
 
+  rpc DeployContainer(DeployContainerRequest) returns (google.protobuf.Empty);
+
   rpc Rollback(google.protobuf.Empty) returns (google.protobuf.Empty);
 
   rpc GetLastException(google.protobuf.Empty) returns (GetLastExceptionResponse);
@@ -87,6 +89,17 @@ message ApplyDacPacRequest{
 	int32 projectId = 4;
 	bool backupDatabaseBeforeChanges = 5;
 	bool blockOnPossibleDataLos = 6;
+}
+
+message DeployContainerRequest{
+	string containerName = 1;
+	int32 projectId = 2;
+	string ports = 3;
+	string environmentVariables = 4;
+	string labels = 5;
+	string volumes = 6;
+	string restartPolicy = 7;
+	string networks = 8;
 }
 
 message ExceptionDataInfo{

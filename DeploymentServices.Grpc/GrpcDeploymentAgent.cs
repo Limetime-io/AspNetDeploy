@@ -168,6 +168,10 @@ namespace DeploymentServices.Grpc
                     this.ProcessDacpacStep(deploymentStep);
                     break;
 
+                case DeploymentStepType.DeployContainer:
+                    this.ProcessDeployContainerStep(deploymentStep);
+                    break;
+
                 default:
                     throw new AspNetDeployException("Deployment step type is not supported: " + deploymentStep.Type);
             }
@@ -245,6 +249,21 @@ namespace DeploymentServices.Grpc
             {
                 File = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("File")),
                 Content = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("SetValues"))
+            });
+        }
+
+        private void ProcessDeployContainerStep(DeploymentStep deploymentStep)
+        {
+            this.deploymentClient.DeployContainer(new DeployContainerRequest()
+            {
+                ContainerName = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("Container.Name")),
+                ProjectId = deploymentStep.GetIntProperty("ProjectId"),
+                Ports = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("Container.Ports")),
+                EnvironmentVariables = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("Container.EnvironmentVariables")),
+                Labels = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("Container.Labels")),
+                Volumes = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("Container.Volumes")),
+                RestartPolicy = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("Container.RestartPolicy")),
+                Networks = this.variableProcessor.ProcessValue(deploymentStep.GetStringProperty("Container.Networks"))
             });
         }
 

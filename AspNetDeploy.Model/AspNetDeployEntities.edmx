@@ -156,6 +156,8 @@
 					<Property Name="URL" Type="nvarchar" MaxLength="4000" />
 					<Property Name="Login" Type="nvarchar" MaxLength="250" Nullable="false" />
 					<Property Name="Password" Type="nvarchar" MaxLength="250" Nullable="false" />
+					<Property Name="PlatformId" Type="int" Nullable="false" />
+					<Property Name="ArchitectureId" Type="int" Nullable="false" />
 				</EntityType>
 				<EntityType Name="MachinePublication">
 					<Key>
@@ -1653,6 +1655,8 @@
 					<Property Name="Login" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
 					<Property Name="Password" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
 					<NavigationProperty Name="DataFieldValues" Relationship="AspNetDeployModel.FK_DataFieldValue_Machine" FromRole="Machine" ToRole="DataFieldValue" />
+					<Property Name="PlatformId" Type="Int32" Nullable="false" />
+					<Property Name="ArchitectureId" Type="Int32" Nullable="false" />
 				</EntityType>
 				<EntityType Name="MachineRole">
 					<Key>
@@ -2654,6 +2658,8 @@
 								<ScalarProperty Name="URL" ColumnName="URL" />
 								<ScalarProperty Name="Name" ColumnName="Name" />
 								<ScalarProperty Name="Id" ColumnName="Id" />
+								<ScalarProperty Name="PlatformId" ColumnName="PlatformId" />
+								<ScalarProperty Name="ArchitectureId" ColumnName="ArchitectureId" />
 							</MappingFragment>
 						</EntityTypeMapping>
 					</EntitySetMapping>
