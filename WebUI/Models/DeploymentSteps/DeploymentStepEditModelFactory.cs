@@ -128,13 +128,16 @@ namespace AspNetDeploy.WebUI.Models.DeploymentSteps
                         DeploymentStepId = deploymentStep.Id,
                         Roles = string.Join(", ", deploymentStep.MachineRoles.Select(mr => mr.Name)),
                         StepTitle = deploymentStep.GetStringProperty("Step.Title"),
+                        ProjectId = deploymentStep.GetIntProperty("ProjectId"),
                         ContainerName = deploymentStep.GetStringProperty("Container.Name"),
                         Ports = deploymentStep.GetStringProperty("Container.Ports"),
                         EnvironmentVariables = deploymentStep.GetStringProperty("Container.EnvironmentVariables"),
                         Labels = deploymentStep.GetStringProperty("Container.Labels"),
                         Volumes = deploymentStep.GetStringProperty("Container.Volumes"),
                         RestartPolicy = deploymentStep.GetStringProperty("Container.RestartPolicy"),
-                        Networks = deploymentStep.GetStringProperty("Container.Networks")
+                        Networks = deploymentStep.GetStringProperty("Container.Networks"),
+                        Platform = (NetCorePlatform)deploymentStep.GetIntProperty("Container.Platform"),
+                        Architecture = (NetCoreArchitecture)deploymentStep.GetIntProperty("Container.Architecture")
                     };
                     break;
                 default:

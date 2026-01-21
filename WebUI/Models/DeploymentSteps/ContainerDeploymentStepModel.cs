@@ -1,4 +1,6 @@
-﻿namespace AspNetDeploy.WebUI.Models.DeploymentSteps
+﻿using AspNetDeploy.Model;
+
+namespace AspNetDeploy.WebUI.Models.DeploymentSteps
 {
     public class ContainerDeploymentStepModel : ProjectRelatedDeploymentStepModel
     {
@@ -10,5 +12,7 @@
         public string Volumes { get; set; }
         public string RestartPolicy { get; set; }
         public string Networks { get; set; }
+        public NetCorePlatform Platform { get; set; }
+        public NetCoreArchitecture Architecture { get; set; }
     }
 }

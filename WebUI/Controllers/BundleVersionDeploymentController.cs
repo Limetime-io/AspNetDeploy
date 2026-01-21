@@ -9,6 +9,7 @@ using AspNetDeploy.Model;
 using AspNetDeploy.WebUI.Models;
 using AspNetDeploy.WebUI.Models.DeploymentSteps;
 using MvcSiteMapProvider.Linq;
+using Newtonsoft.Json;
 
 namespace AspNetDeploy.WebUI.Controllers
 {
@@ -224,23 +225,14 @@ namespace AspNetDeploy.WebUI.Controllers
 
             if (deploymentStepType == DeploymentStepType.DeployContainer)
             {
-                this.ViewBag.ProjectsSelect = this.Entities.SourceControlVersion
-                    .SelectMany(scv => scv.ProjectVersions)
-                    .Where(pv => pv.ProjectType.HasFlag(ProjectType.Web) && pv.ProjectType.HasFlag(ProjectType.NetCore))
-                    .Where(pv => !pv.Project.Properties.Any(p => p.Key == "NotForDeployment" && p.Value == "true"))
-                    //.Where(pv => pv.Properties.Any(p => p.Key == "TargetFrameworkVersion" && (p.Value.Contains("net8.0") || p.Value.Contains("net9.0") || p.Value.Contains("net10.0"))))
-                    .Select(pv => new SelectListItem
-                    {
-                        Text = pv.SourceControlVersion.SourceControl.Name + " / " + pv.SourceControlVersion.Name + " / " + pv.Name,
-                        Value = pv.Id.ToString()
-                    })
-                    .OrderBy(sli => sli.Text)
-                    .ToList();
+                this.PopulateContainerProjectsSelect(false);
 
                 ContainerDeploymentStepModel model = new ContainerDeploymentStepModel
                 {
                     BundleVersionId = bundleVersion.Id
                 };
+
+                this.PopulateContainerSelectLists(model);
 
                 return this.View("EditContainerStep", model);
             }
@@ -469,22 +461,14 @@ namespace AspNetDeploy.WebUI.Controllers
                     Labels = deploymentStep.GetStringProperty("Container.Labels"),
                     Volumes = deploymentStep.GetStringProperty("Container.Volumes"),
                     RestartPolicy = deploymentStep.GetStringProperty("Container.RestartPolicy"),
-                    Networks = deploymentStep.GetStringProperty("Container.Networks")
+                    Networks = deploymentStep.GetStringProperty("Container.Networks"),
+                    Platform = (NetCorePlatform)deploymentStep.GetIntProperty("Container.Platform"),
+                    Architecture = (NetCoreArchitecture)deploymentStep.GetIntProperty("Container.Architecture")
                 };
 
-                this.ViewBag.ProjectsSelect = this.Entities.SourceControlVersion
-                    .SelectMany(scv => scv.ProjectVersions)
-                    .Where(pv => pv.ProjectType.HasFlag(ProjectType.Web) && pv.ProjectType.HasFlag(ProjectType.NetCore))
-                    .Where(pv => !pv.Project.Properties.Any(p => p.Key == "NotForDeployment" && p.Value == "true"))
-                    .Where(pv => pv.Properties.Any(p => p.Key == "TargetFrameworkVersion" &&
-                        (p.Value.Contains("net8.0") || p.Value.Contains("net9.0") || p.Value.Contains("net10.0"))))
-                    .Select(pv => new SelectListItem
-                    {
-                        Text = pv.SourceControlVersion.SourceControl.Name + " / " + pv.SourceControlVersion.Name + " / " + pv.Name,
-                        Value = pv.Id.ToString()
-                    })
-                    .OrderBy(sli => sli.Text)
-                    .ToList();
+                this.PopulateContainerProjectsSelect(true);
+
+                this.PopulateContainerSelectLists(model);
 
                 return this.View("EditContainerStep", model);
             }
@@ -707,6 +691,13 @@ namespace AspNetDeploy.WebUI.Controllers
 
             if (!this.ModelState.IsValid)
             {
+                BundleVersion bundleVersion = this.Entities.BundleVersion
+                    .Include("Bundle")
+                    .First(bv => bv.Id == model.BundleVersionId);
+                this.ViewBag.BundleVersion = bundleVersion;
+                this.ViewBag.MachineRoles = this.Entities.MachineRole.ToList();
+                this.PopulateContainerProjectsSelect(model.DeploymentStepId > 0);
+                this.PopulateContainerSelectLists(model);
                 return this.View("EditContainerStep", model);
             }
 
@@ -720,6 +711,8 @@ namespace AspNetDeploy.WebUI.Controllers
             deploymentStep.SetStringProperty("Container.Volumes", model.Volumes);
             deploymentStep.SetStringProperty("Container.RestartPolicy", model.RestartPolicy);
             deploymentStep.SetStringProperty("Container.Networks", model.Networks);
+            deploymentStep.SetStringProperty("Container.Platform", ((int)model.Platform).ToString(CultureInfo.InvariantCulture));
+            deploymentStep.SetStringProperty("Container.Architecture", ((int)model.Architecture).ToString(CultureInfo.InvariantCulture));
             deploymentStep.SetStringProperty("ProjectId", model.ProjectId.ToString(CultureInfo.InvariantCulture));
 
             this.UpdateProjectReference(model);
@@ -818,7 +811,16 @@ namespace AspNetDeploy.WebUI.Controllers
 
             foreach (ProjectVersionToBundleVersion link in bundleVersion.ProjectVersionToBundleVersion.ToList())
             {
-                if (bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != link.ProjectVersionId))
+                bool isContainerLink = link.PackagerId.HasValue && link.PackagerId.Value == (int)PackagerType.Docker;
+                bool hasContainerStep = bundleVersion.DeploymentSteps.Any(ds =>
+                    ds.Type == DeploymentStepType.DeployContainer &&
+                    ds.GetIntProperty("ProjectId") == link.ProjectVersionId);
+
+                if (isContainerLink && !hasContainerStep)
+                {
+                    this.Entities.ProjectVersionToBundleVersion.Remove(link);
+                }
+                else if (!isContainerLink && bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != link.ProjectVersionId))
                 {
                     this.Entities.ProjectVersionToBundleVersion.Remove(link);
                 }
@@ -826,31 +828,81 @@ namespace AspNetDeploy.WebUI.Controllers
 
             if (model.ProjectId > 0) // add project
             {
-                ProjectVersion projectVersion = this.Entities.ProjectVersion.First(pv => pv.Id == model.ProjectId);
+                int? packagerId = model is ContainerDeploymentStepModel ? (int)PackagerType.Docker : (int?)null;
 
-                ProjectVersionToBundleVersion newLink = new ProjectVersionToBundleVersion();
+                ProjectVersionToBundleVersion existingLink = bundleVersion.ProjectVersionToBundleVersion
+                    .FirstOrDefault(x => x.ProjectVersionId == model.ProjectId && x.PackagerId == packagerId);
 
-                newLink.BundleVersion = bundleVersion;
-                newLink.ProjectVersionId = model.ProjectId;
-
-                if (model is ContainerDeploymentStepModel)
+                if (existingLink == null)
                 {
-                    newLink.PackagerId = (int)PackagerType.Docker;
+                    existingLink = new ProjectVersionToBundleVersion
+                    {
+                        BundleVersion = bundleVersion,
+                        ProjectVersionId = model.ProjectId,
+                        PackagerId = packagerId
+                    };
+
+                    this.Entities.ProjectVersionToBundleVersion.Add(existingLink);
                 }
-                else
-                {
-                    newLink.PackagerId = null;
-                }
 
-                if (!this.Entities.ProjectVersionToBundleVersion.Any(x => 
-                    x.BundleVersionId == bundleVersion.Id &&
-                    x.ProjectVersionId == newLink.ProjectVersionId &&
-                    x.PackagerId == newLink.PackagerId
-                ))
+                if (model is ContainerDeploymentStepModel containerModel)
                 {
-                    this.Entities.ProjectVersionToBundleVersion.Add(newLink);
+                    NetCoreProjectBundleConfig config = new NetCoreProjectBundleConfig
+                    {
+                        Platform = containerModel.Platform,
+                        Architecture = containerModel.Architecture,
+                        OutputType = NetCoreOutputType.DockerContainer
+                    };
+
+                    existingLink.ConfigurationJson = JsonConvert.SerializeObject(config);
                 }
             }
+        }
+
+        private void PopulateContainerSelectLists(ContainerDeploymentStepModel model)
+        {
+            this.ViewBag.NetCorePlatforms = Enum.GetValues(typeof(NetCorePlatform))
+                .Cast<NetCorePlatform>()
+                .Select(value => new SelectListItem
+                {
+                    Text = value.ToString(),
+                    Value = ((int)value).ToString(CultureInfo.InvariantCulture),
+                    Selected = value == model.Platform
+                })
+                .ToList();
+
+            this.ViewBag.NetCoreArchitectures = Enum.GetValues(typeof(NetCoreArchitecture))
+                .Cast<NetCoreArchitecture>()
+                .Select(value => new SelectListItem
+                {
+                    Text = value.ToString(),
+                    Value = ((int)value).ToString(CultureInfo.InvariantCulture),
+                    Selected = value == model.Architecture
+                })
+                .ToList();
+        }
+
+        private void PopulateContainerProjectsSelect(bool includeTargetFrameworkFilter)
+        {
+            IQueryable<ProjectVersion> projectQuery = this.Entities.SourceControlVersion
+                .SelectMany(scv => scv.ProjectVersions)
+                .Where(pv => pv.ProjectType.HasFlag(ProjectType.Web) && pv.ProjectType.HasFlag(ProjectType.NetCore))
+                .Where(pv => !pv.Project.Properties.Any(p => p.Key == "NotForDeployment" && p.Value == "true"));
+
+            if (includeTargetFrameworkFilter)
+            {
+                projectQuery = projectQuery.Where(pv => pv.Properties.Any(p => p.Key == "TargetFrameworkVersion" &&
+                    (p.Value.Contains("net8.0") || p.Value.Contains("net9.0") || p.Value.Contains("net10.0"))));
+            }
+
+            this.ViewBag.ProjectsSelect = projectQuery
+                .Select(pv => new SelectListItem
+                {
+                    Text = pv.SourceControlVersion.SourceControl.Name + " / " + pv.SourceControlVersion.Name + " / " + pv.Name,
+                    Value = pv.Id.ToString()
+                })
+                .OrderBy(sli => sli.Text)
+                .ToList();
         }
 
     }
