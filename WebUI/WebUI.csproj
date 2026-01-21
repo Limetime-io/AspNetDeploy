@@ -365,6 +365,7 @@
     <Content Include="Views\Machines\List.cshtml" />
     <Content Include="Views\Machines\DownloadMachineInstance.cshtml" />
     <Content Include="Views\Sources\CreateNewVersionGit.cshtml" />
+    <Content Include="Views\BundleVersionDeployment\EditContainerStep.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

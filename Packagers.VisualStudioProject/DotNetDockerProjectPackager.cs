@@ -13,56 +13,91 @@ namespace Packagers.VisualStudioProject
 
         public DotNetDockerProjectPackager()
         {
-            NetCoreProjectBundleConfig = new NetCoreProjectBundleConfig();
+            NetCoreProjectBundleConfig = new NetCoreProjectBundleConfig
+            {
+                Platform = NetCorePlatform.Linux,
+                Architecture = NetCoreArchitecture.x64,
+                OutputType = NetCoreOutputType.DockerContainer
+            };
         }
 
         public DotNetDockerProjectPackager(NetCoreProjectBundleConfig netCoreProjectBundleConfig)
         {
-            NetCoreProjectBundleConfig = netCoreProjectBundleConfig;
+            NetCoreProjectBundleConfig = netCoreProjectBundleConfig ?? throw new ArgumentNullException(nameof(netCoreProjectBundleConfig));
         }
 
 
         protected override void PackageProjectContents(ZipFile zipFile, XDocument xDocument, XNamespace vsNamespace, string projectRootFolder)
         {
-            XElement targetFramework = xDocument.Descendants("TargetFramework").FirstOrDefault();
+            // Build path based on configuration: bin/{os}/{arch}/{output-type}/container.tar.gz
+            string os = GetOsParameter(NetCoreProjectBundleConfig.Platform);
+            string arch = GetArchParameter(NetCoreProjectBundleConfig.Architecture);
+            string outputType = GetOutputTypeParameter(NetCoreProjectBundleConfig.OutputType);
 
-            if (targetFramework == null)
-            {
-                throw new VisualStudioPackagerException("targetFramework not set");
-            }
-
-            if (!this.IsFrameworkSupported(targetFramework.Value))
-            {
-                throw new VisualStudioPackagerException("targetFramework not supported: " + targetFramework.Value);
-            }
-
-            // TODO: CREATE DOCKER IMAGE
-
-            AddProjectDirectory(
-                zipFile,
+            string containerPath = Path.Combine(
                 projectRootFolder,
-                Path.Combine("bin", "Release", targetFramework.Value, "publish"),
-                "\\");
+                "bin",
+                os ?? "default",
+                arch ?? "default",
+                outputType ?? "default",
+                "container.tar.gz"
+            );
+
+            if (!File.Exists(containerPath))
+            {
+                throw new VisualStudioPackagerException($"Docker container not found at: {containerPath}");
+            }
+
+            // Add the container.tar.gz file to the package
+            zipFile.AddFile(containerPath, "\\");
         }
 
-        private bool IsFrameworkSupported(string targetFramework)
+        private string GetOsParameter(NetCorePlatform platform)
         {
-            if (targetFramework.Equals("net8.0", StringComparison.InvariantCultureIgnoreCase))
+            switch (platform)
             {
-                return true;
+                case NetCorePlatform.Windows:
+                    return "windows";
+                case NetCorePlatform.Linux:
+                    return "linux";
+                case NetCorePlatform.MacOS:
+                    return "osx";
+                case NetCorePlatform.Undefined:
+                default:
+                    return null;
             }
+        }
 
-            if (targetFramework.Equals("net9.0", StringComparison.InvariantCultureIgnoreCase))
+        private string GetArchParameter(NetCoreArchitecture architecture)
+        {
+            switch (architecture)
             {
-                return true;
+                case NetCoreArchitecture.x86:
+                    return "x86";
+                case NetCoreArchitecture.x64:
+                    return "x64";
+                case NetCoreArchitecture.arm:
+                    return "arm";
+                case NetCoreArchitecture.arm64:
+                    return "arm64";
+                case NetCoreArchitecture.Undefined:
+                default:
+                    return null;
             }
+        }
 
-            if (targetFramework.Equals("net10.0", StringComparison.InvariantCultureIgnoreCase))
+        private string GetOutputTypeParameter(NetCoreOutputType outputType)
+        {
+            switch (outputType)
             {
-                return true;
+                case NetCoreOutputType.Exe:
+                    return "exe";
+                case NetCoreOutputType.DockerContainer:
+                    return "docker";
+                case NetCoreOutputType.Undefined:
+                default:
+                    return null;
             }
-
-            return false;
         }
     }
 }

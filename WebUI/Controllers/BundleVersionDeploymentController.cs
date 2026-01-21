@@ -812,15 +812,43 @@ namespace AspNetDeploy.WebUI.Controllers
             foreach (ProjectVersionToBundleVersion link in bundleVersion.ProjectVersionToBundleVersion.ToList())
             {
                 bool isContainerLink = link.PackagerId.HasValue && link.PackagerId.Value == (int)PackagerType.Docker;
-                bool hasContainerStep = bundleVersion.DeploymentSteps.Any(ds =>
-                    ds.Type == DeploymentStepType.DeployContainer &&
-                    ds.GetIntProperty("ProjectId") == link.ProjectVersionId);
 
-                if (isContainerLink && !hasContainerStep)
+                if (isContainerLink)
                 {
-                    this.Entities.ProjectVersionToBundleVersion.Remove(link);
+                    // For container links, check if there's a matching step with same ProjectId AND ConfigurationJson
+                    bool hasMatchingContainerStep = bundleVersion.DeploymentSteps.Any(ds =>
+                    {
+                        if (ds.Type != DeploymentStepType.DeployContainer)
+                            return false;
+
+                        if (ds.GetIntProperty("ProjectId") != link.ProjectVersionId)
+                            return false;
+
+                        // Get Platform and Architecture from deployment step properties
+                        int platform = ds.GetIntProperty("Container.Platform");
+                        int architecture = ds.GetIntProperty("Container.Architecture");
+
+                        // Create config from step properties
+                        NetCoreProjectBundleConfig stepConfig = new NetCoreProjectBundleConfig
+                        {
+                            Version = 1,
+                            Type = ProjectBundleConfigType.NetCore,
+                            Platform = (NetCorePlatform)platform,
+                            Architecture = (NetCoreArchitecture)architecture,
+                            OutputType = NetCoreOutputType.DockerContainer
+                        };
+
+                        string stepConfigJson = JsonConvert.SerializeObject(stepConfig);
+
+                        return stepConfigJson == link.ConfigurationJson;
+                    });
+
+                    if (!hasMatchingContainerStep)
+                    {
+                        this.Entities.ProjectVersionToBundleVersion.Remove(link);
+                    }
                 }
-                else if (!isContainerLink && bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != link.ProjectVersionId))
+                else if (bundleVersion.DeploymentSteps.All(ds => ds.GetIntProperty("ProjectId") != link.ProjectVersionId))
                 {
                     this.Entities.ProjectVersionToBundleVersion.Remove(link);
                 }
@@ -829,9 +857,29 @@ namespace AspNetDeploy.WebUI.Controllers
             if (model.ProjectId > 0) // add project
             {
                 int? packagerId = model is ContainerDeploymentStepModel ? (int)PackagerType.Docker : (int?)null;
+                string configurationJson = null;
 
+                // For container models, create configuration JSON first
+                if (model is ContainerDeploymentStepModel containerModel)
+                {
+                    NetCoreProjectBundleConfig config = new NetCoreProjectBundleConfig
+                    {
+                        Version = 1,
+                        Type = ProjectBundleConfigType.NetCore,
+                        Platform = containerModel.Platform,
+                        Architecture = containerModel.Architecture,
+                        OutputType = NetCoreOutputType.DockerContainer
+                    };
+
+                    configurationJson = JsonConvert.SerializeObject(config);
+                }
+
+                // Find existing link by ProjectId, PackagerId, and ConfigurationJson
+                // This ensures different targets create separate entries
                 ProjectVersionToBundleVersion existingLink = bundleVersion.ProjectVersionToBundleVersion
-                    .FirstOrDefault(x => x.ProjectVersionId == model.ProjectId && x.PackagerId == packagerId);
+                    .FirstOrDefault(x => x.ProjectVersionId == model.ProjectId &&
+                                       x.PackagerId == packagerId &&
+                                       (configurationJson == null || x.ConfigurationJson == configurationJson));
 
                 if (existingLink == null)
                 {
@@ -839,22 +887,11 @@ namespace AspNetDeploy.WebUI.Controllers
                     {
                         BundleVersion = bundleVersion,
                         ProjectVersionId = model.ProjectId,
-                        PackagerId = packagerId
+                        PackagerId = packagerId,
+                        ConfigurationJson = configurationJson
                     };
 
                     this.Entities.ProjectVersionToBundleVersion.Add(existingLink);
-                }
-
-                if (model is ContainerDeploymentStepModel containerModel)
-                {
-                    NetCoreProjectBundleConfig config = new NetCoreProjectBundleConfig
-                    {
-                        Platform = containerModel.Platform,
-                        Architecture = containerModel.Architecture,
-                        OutputType = NetCoreOutputType.DockerContainer
-                    };
-
-                    existingLink.ConfigurationJson = JsonConvert.SerializeObject(config);
                 }
             }
         }
@@ -891,8 +928,8 @@ namespace AspNetDeploy.WebUI.Controllers
 
             if (includeTargetFrameworkFilter)
             {
-                projectQuery = projectQuery.Where(pv => pv.Properties.Any(p => p.Key == "TargetFrameworkVersion" &&
-                    (p.Value.Contains("net8.0") || p.Value.Contains("net9.0") || p.Value.Contains("net10.0"))));
+               // projectQuery = projectQuery.Where(pv => pv.Properties.Any(p => p.Key == "TargetFrameworkVersion" &&
+               //     (p.Value.Contains("net8.0") || p.Value.Contains("net9.0") || p.Value.Contains("net10.0"))));
             }
 
             this.ViewBag.ProjectsSelect = projectQuery

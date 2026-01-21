@@ -35,20 +35,19 @@
 
         </div>
     </h1>
+    <br />
 
-    <hr />
-
-    <ul class="nav nav-pills" role="tablist">
-        <li role="presentation"><a href="@Url.Action("VersionProjects", "Bundles", new { id = bundleVersion.Id })">Projects</a></li>
-        <li role="presentation" class="active"><a href="@Url.Action("VersionDeployment", "Bundles", new { id = bundleVersion.Id })">Deployment process</a></li>
-        <li role="presentation"><a href="@Url.Action("VersionPackages", "Bundles", new { id = bundleVersion.Id })">Packages & Publications</a></li>
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a class="nav-link" href="@Url.Action("VersionProjects", "Bundles", new { id = bundleVersion.Id })">Projects</a></li>
+        <li class="nav-item active"><a class="nav-link" href="@Url.Action("VersionDeployment", "Bundles", new { id = bundleVersion.Id })">Deployment process</a></li>
+        <li class="nav-item"><a class="nav-link" href="@Url.Action("VersionPackages", "Bundles", new { id = bundleVersion.Id })">Packages & Publications</a></li>
     </ul>
 
-    <hr />
+    <div class="section">
 
-    <h3>@this.Model.OrderIndex. Deploy: @this.Model.StepTitle <small>ZIP</small></h3>
+        <h3>@this.Model.OrderIndex. Deploy: @this.Model.StepTitle <small>ZIP</small></h3>
 
-    @using (Html.BeginForm("SaveZipArchiveStep", "BundleVersionDeployment", new { }, FormMethod.Post, new { id = "idForm", Class = "form-horizontal" }))
+        @using (Html.BeginForm("SaveZipArchiveStep", "BundleVersionDeployment", new { }, FormMethod.Post, new { id = "idForm", Class = "form-horizontal" }))
     {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(m => m.BundleVersionId)
@@ -116,7 +115,9 @@
                 </div>
             </div>
         </div>
-    }
+        }
+
+    </div>
 
     <script>
 

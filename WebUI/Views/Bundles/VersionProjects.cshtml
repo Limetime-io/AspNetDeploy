@@ -47,6 +47,8 @@
     {
         foreach (ProjectVersionToBundleVersion projectVersionLink in bundleVersion.ProjectVersionToBundleVersion.Where(pv => pv.ProjectVersion.ProjectType.HasFlag(projectType)))
         {
+            var config = ProjectBundleConfigFactory.Create(projectVersionLink.ConfigurationJson);
+
             <div class="row">
                 <div class="col-sm-6">
                     @if (projectVersionLink.ProjectVersion.ProjectType.HasFlag(ProjectType.Web))
@@ -75,13 +77,15 @@
                     }
                     <a href="@Url.Action("Details", "ProjectVersions", new { id = projectVersionLink.ProjectVersionId })">@projectVersionLink.ProjectVersion.SourceControlVersion.SourceControl.Name / @projectVersionLink.ProjectVersion.SourceControlVersion.Name / @projectVersionLink.ProjectVersion.Name</a>
 
-                    @if (projectVersionLink.PackagerId != null)
+                    @if (config != null)
                     {
-                        switch ((AspNetDeploy.Contracts.PackagerType)projectVersionLink.PackagerId.Value)
+                        if (config is NetCoreProjectBundleConfig)
                         {
-                            case AspNetDeploy.Contracts.PackagerType.Docker:
-                                <span>Packager:Docker</span>
-                                break;
+                            var netCoreConfig = config as NetCoreProjectBundleConfig;
+
+                            <span class="badge rounded-pill text-bg-dark">@netCoreConfig.Platform</span>
+                            <span class="badge rounded-pill text-bg-dark">@netCoreConfig.Architecture</span>
+                            <span class="badge rounded-pill text-bg-dark">@netCoreConfig.OutputType</span>
                         }
                     }
                 </div>
